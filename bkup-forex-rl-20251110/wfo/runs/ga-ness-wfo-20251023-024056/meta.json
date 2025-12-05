@@ -1,0 +1,13 @@
+{
+  "adapter": "ga-ness",
+  "cfg": {
+    "start": "2023-01-01",
+    "end": "2023-02-01",
+    "train_n": 2.0,
+    "val_n": 1.0,
+    "step_n": 1.0,
+    "unit": "weeks",
+    "base_gran": "M5",
+    "windows": 2
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "max-rows": {
+    "population": 8,
+    "generations": 3,
+    "subsample": 40,
+    "train_max_rows": 20000,
+    "val_max_rows": 8000
+  },
+  "full": {
+    "population": 200,
+    "generations": 10,
+    "subsample": 1,
+    "train_max_rows": 0,
+    "val_max_rows": 0
+  }
+}

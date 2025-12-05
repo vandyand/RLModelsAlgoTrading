@@ -1,0 +1,32 @@
+{
+  "args": {
+    "start": "2023-01-01",
+    "end": "2023-01-20",
+    "train_n": 7.5,
+    "val_n": 3.5,
+    "step_n": 3.5,
+    "weeks": false,
+    "days": false,
+    "unit": "days",
+    "windows_limit": 1,
+    "instruments": ",",
+    "grans": "H1,D",
+    "epochs": 1,
+    "gamma": 0.99,
+    "actor_sigma": 0.3,
+    "entropy_coef": 0.001,
+    "lr": 0.001,
+    "hidden": 256,
+    "reward_scale": 1.0,
+    "max_grad_norm": 1.0,
+    "enter_long": 0.8,
+    "exit_long": 0.6,
+    "enter_short": 0.2,
+    "exit_short": 0.4,
+    "base_dir": "ac-multi20/runs",
+    "no_save": false,
+    "carry_forward": false,
+    "init_model": ""
+  },
+  "windows": 1
+}

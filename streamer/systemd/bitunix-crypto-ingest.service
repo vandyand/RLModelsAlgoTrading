@@ -1,0 +1,21 @@
+[Unit]
+Description=Bitunix Public WS -> QuestDB ingester
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/default/bitunix-crypto-ingest
+ExecStart=/root/rl-trader/streamer/venv/bin/python /root/rl-trader/streamer/bitunix_to_questdb.py --depth-level 15 --batch 200
+StandardOutput=journal
+StandardError=journal
+Restart=always
+RestartSec=2
+# Hardening (relaxed to allow /root working directory)
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+# ProtectHome=true prevents access to /root; leave off since code lives under /root
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,1 @@
+nohup python walk_forward_gp.py --start 2020-01-01 --end 2025-07-01 --train-weeks 4 --val-weeks 1 --step-weeks 1 --population 100 --generations 20 --subsample 1 --strategy-type nn --nn-arch 32,16 --input-norm rolling --nn-mutation-prob 0.25 --nn-mutation-sigma 0.025 --ff-enable --ff-mode nn --per-window-build --warmup-days 20 &

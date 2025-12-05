@@ -1,0 +1,13 @@
+{
+  "adapter": "ac-multi20",
+  "cfg": {
+    "start": "2023-01-01",
+    "end": "2023-03-01",
+    "train_n": 0.5,
+    "val_n": 0.5,
+    "step_n": 0.5,
+    "unit": "months",
+    "base_gran": "M5",
+    "windows": 2
+  }
+}

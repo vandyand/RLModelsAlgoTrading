@@ -1,0 +1,68 @@
+{
+  "loader": {
+    "instruments": [
+      "EUR_USD", "USD_JPY", "GBP_USD", "AUD_USD", "USD_CHF",
+      "USD_CAD", "NZD_USD", "EUR_JPY", "GBP_JPY", "EUR_GBP",
+      "EUR_CHF", "EUR_AUD", "EUR_CAD", "GBP_CHF", "AUD_JPY",
+      "AUD_CHF", "CAD_JPY", "NZD_JPY", "GBP_AUD", "AUD_NZD"
+    ],
+    "base_granularity": "M5",
+    "aux_granularities": ["D"],
+    "normalize": true,
+    "max_rows": 20000
+  },
+  "train_ranges": {
+    "train": "2021-01-01:2024-01-01",
+    "val": "2024-01-02:2025-10-01"
+  },
+  "gradient_nn": {
+    "hidden_dims": [64, 32],
+    "dropout": 0.1,
+    "learning_rate": 0.001,
+    "batch_size": 64,
+    "epochs": 3,
+    "patience": 2,
+    "l2": 0.0001,
+    "checkpoint_every": 1,
+    "checkpoint_prefix": "ga-trailing-20/checkpoints/gradient_nn_ep"
+  },
+  "neuro_ga": {
+    "population": 6,
+    "generations": 2,
+    "hidden_layers": [32],
+    "mutation_prob": 0.2,
+    "weight_sigma": 0.05,
+    "bias_sigma": 0.02,
+    "crossover_frac": 0.3,
+    "elite_frac": 0.1,
+    "l2": 0.0001,
+    "complexity_penalty": 0.0
+  },
+  "simulator": {
+    "trailing_mode": "atr",
+    "atr_period": 20,
+    "atr_multiplier": 1.0
+  },
+  "cost_model": {
+    "spread_mode": "static",
+    "commission_per_million": 0.0,
+    "slippage_mode": "deterministic",
+    "slippage_pips": 0.1
+  },
+  "multihead_gated_nn": {
+    "hidden_dims": [64, 64],
+    "dropout": 0.1,
+    "learning_rate": 0.001,
+    "batch_size": 256,
+    "epochs": 8,
+    "patience": 3,
+    "l2": 1e-5,
+    "active_frac": 0.02,
+    "gate_ret_threshold": 0.005,
+    "gate_sparsity_weight": 0.05,
+    "max_train_bars": 2000,
+    "max_val_bars": 800,
+    "checkpoint_every": 0,
+    "checkpoint_prefix": "ga-trailing-20/checkpoints/multihead_gated_nn_default"
+  }
+}

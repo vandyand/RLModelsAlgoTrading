@@ -1,0 +1,41 @@
+/root/rl-trader/forex-rl/ga-multi20/train_ga_multi20.py:177: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  ts = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
+Loading features for 20 instruments...
+Running GA...
+Gen 000 | score=0.621688 | pop_avg=0.419113 | time=407.39s | cum=0.0101 sharpe=0.8310 sortino=1.0437 maxDD=-0.0082 trades=814 tim=0.9805 PF=1.238 WR=0.463 WL=0.862 R2=0.900
+Gen 001 | score=0.655582 | pop_avg=0.470534 | time=383.41s | cum=0.0183 sharpe=1.1552 sortino=1.5209 maxDD=-0.0122 trades=2995 tim=0.9313 PF=1.157 WR=0.419 WL=0.722 R2=0.919
+Gen 002 | score=0.655582 | pop_avg=0.497064 | time=357.95s | cum=0.0183 sharpe=1.1552 sortino=1.5209 maxDD=-0.0122 trades=2995 tim=0.9313 PF=1.157 WR=0.419 WL=0.722 R2=0.919
+Gen 003 | score=0.671744 | pop_avg=0.518941 | time=354.07s | cum=0.0210 sharpe=1.3751 sortino=1.7189 maxDD=-0.0119 trades=1291 tim=0.9195 PF=1.449 WR=0.418 WL=0.719 R2=0.921
+Gen 004 | score=0.678923 | pop_avg=0.530319 | time=403.11s | cum=0.0204 sharpe=1.3973 sortino=1.8919 maxDD=-0.0104 trades=1497 tim=0.9141 PF=1.296 WR=0.467 WL=0.876 R2=0.917
+Gen 005 | score=0.678923 | pop_avg=0.531102 | time=377.35s | cum=0.0204 sharpe=1.3973 sortino=1.8919 maxDD=-0.0104 trades=1497 tim=0.9141 PF=1.296 WR=0.467 WL=0.876 R2=0.917
+Gen 006 | score=0.741146 | pop_avg=0.551650 | time=364.72s | cum=0.0321 sharpe=1.8894 sortino=2.3758 maxDD=-0.0116 trades=435 tim=0.9427 PF=2.522 WR=0.445 WL=0.802 R2=0.899
+Gen 007 | score=0.741146 | pop_avg=0.558582 | time=362.09s | cum=0.0321 sharpe=1.8894 sortino=2.3758 maxDD=-0.0116 trades=435 tim=0.9427 PF=2.522 WR=0.445 WL=0.802 R2=0.899
+Gen 008 | score=0.741146 | pop_avg=0.575391 | time=367.10s | cum=0.0321 sharpe=1.8894 sortino=2.3758 maxDD=-0.0116 trades=435 tim=0.9427 PF=2.522 WR=0.445 WL=0.802 R2=0.899
+Gen 009 | score=0.741146 | pop_avg=0.576400 | time=392.45s | cum=0.0321 sharpe=1.8894 sortino=2.3758 maxDD=-0.0116 trades=435 tim=0.9427 PF=2.522 WR=0.445 WL=0.802 R2=0.899
+Gen 010 | score=0.761864 | pop_avg=0.584092 | time=384.04s | cum=0.0336 sharpe=1.9864 sortino=2.5051 maxDD=-0.0119 trades=400 tim=0.9805 PF=3.056 WR=0.438 WL=0.780 R2=0.895
+Gen 011 | score=0.770756 | pop_avg=0.590960 | time=360.30s | cum=0.0327 sharpe=1.9059 sortino=2.4236 maxDD=-0.0114 trades=166 tim=0.9984 PF=3.072 WR=0.548 WL=1.214 R2=0.905
+Gen 012 | score=0.770756 | pop_avg=0.602522 | time=392.15s | cum=0.0327 sharpe=1.9059 sortino=2.4236 maxDD=-0.0114 trades=166 tim=0.9984 PF=3.072 WR=0.548 WL=1.214 R2=0.905
+Gen 013 | score=0.780659 | pop_avg=0.608998 | time=375.84s | cum=0.0416 sharpe=2.0871 sortino=2.7253 maxDD=-0.0115 trades=1256 tim=0.9166 PF=1.992 WR=0.449 WL=0.815 R2=0.943
+Gen 014 | score=0.780659 | pop_avg=0.610865 | time=375.18s | cum=0.0416 sharpe=2.0871 sortino=2.7253 maxDD=-0.0115 trades=1256 tim=0.9166 PF=1.992 WR=0.449 WL=0.815 R2=0.943
+Gen 015 | score=0.785477 | pop_avg=0.619065 | time=362.43s | cum=0.0427 sharpe=2.0093 sortino=2.5986 maxDD=-0.0117 trades=348 tim=0.9971 PF=3.818 WR=0.484 WL=0.937 R2=0.934
+Gen 016 | score=0.791271 | pop_avg=0.629857 | time=371.19s | cum=0.0362 sharpe=2.1187 sortino=2.6823 maxDD=-0.0083 trades=388 tim=0.9961 PF=2.678 WR=0.480 WL=0.925 R2=0.948
+Gen 017 | score=0.791271 | pop_avg=0.628813 | time=373.12s | cum=0.0362 sharpe=2.1187 sortino=2.6823 maxDD=-0.0083 trades=388 tim=0.9961 PF=2.678 WR=0.480 WL=0.925 R2=0.948
+Gen 018 | score=0.803563 | pop_avg=0.638805 | time=368.15s | cum=0.0451 sharpe=2.1137 sortino=2.7358 maxDD=-0.0117 trades=92 tim=0.9992 PF=6.717 WR=0.589 WL=1.435 R2=0.932
+Gen 019 | score=0.807942 | pop_avg=0.642978 | time=404.26s | cum=0.0381 sharpe=2.0806 sortino=2.6575 maxDD=-0.0097 trades=20 tim=1.0000 PF=6.180 WR=0.650 WL=1.857 R2=0.934
+Gen 020 | score=0.807942 | pop_avg=0.645803 | time=384.47s | cum=0.0381 sharpe=2.0806 sortino=2.6575 maxDD=-0.0097 trades=20 tim=1.0000 PF=6.180 WR=0.650 WL=1.857 R2=0.934
+Gen 021 | score=0.818819 | pop_avg=0.667457 | time=373.00s | cum=0.0416 sharpe=2.2915 sortino=2.9319 maxDD=-0.0087 trades=46 tim=0.9998 PF=7.380 WR=0.636 WL=1.750 R2=0.950
+Gen 022 | score=0.824619 | pop_avg=0.677598 | time=359.80s | cum=0.0453 sharpe=2.1241 sortino=2.7482 maxDD=-0.0116 trades=34 tim=0.9999 PF=11.707 WR=0.704 WL=2.375 R2=0.932
+Gen 023 | score=0.836689 | pop_avg=0.676025 | time=351.24s | cum=0.0453 sharpe=2.1251 sortino=2.7490 maxDD=-0.0117 trades=24 tim=1.0000 PF=10.920 WR=0.818 WL=4.500 R2=0.932
+Gen 024 | score=0.843541 | pop_avg=0.683674 | time=414.87s | cum=0.0454 sharpe=2.1298 sortino=2.7551 maxDD=-0.0116 trades=24 tim=1.0000 PF=11.533 WR=0.864 WL=6.333 R2=0.932
+Gen 025 | score=0.843541 | pop_avg=0.686557 | time=383.81s | cum=0.0454 sharpe=2.1298 sortino=2.7551 maxDD=-0.0116 trades=24 tim=1.0000 PF=11.533 WR=0.864 WL=6.333 R2=0.932
+Gen 026 | score=0.843830 | pop_avg=0.696268 | time=379.90s | cum=0.0453 sharpe=2.1236 sortino=2.7470 maxDD=-0.0116 trades=24 tim=0.9999 PF=14.336 WR=0.864 WL=6.333 R2=0.933
+Gen 027 | score=0.843830 | pop_avg=0.705024 | time=396.65s | cum=0.0453 sharpe=2.1236 sortino=2.7470 maxDD=-0.0116 trades=24 tim=0.9999 PF=14.336 WR=0.864 WL=6.333 R2=0.933
+Gen 028 | score=0.844260 | pop_avg=0.720946 | time=432.79s | cum=0.0452 sharpe=2.1213 sortino=2.7441 maxDD=-0.0116 trades=26 tim=0.9999 PF=14.310 WR=0.870 WL=6.667 R2=0.932
+Gen 029 | score=0.844260 | pop_avg=0.732037 | time=392.02s | cum=0.0452 sharpe=2.1213 sortino=2.7441 maxDD=-0.0116 trades=26 tim=0.9999 PF=14.310 WR=0.870 WL=6.667 R2=0.932
+Best score: 0.844260
+Eval score: 0.800152
+Portfolio metrics:
+{'cum_return': 0.04523133532824897, 'sharpe': 2.1213214270341756, 'sortino': 2.744091161079611, 'max_drawdown': -0.01164111981402105, 'trades': 26.0}
+Trades emitted: 23
+Saved best genome to ga-multi20/checkpoints/best_genome-20251020-140924.json
+Saved run meta to ga-multi20/checkpoints/best_genome-20251020-140924.meta.json

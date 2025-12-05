@@ -1,0 +1,15 @@
+{
+  "event": "wfo_summary",
+  "run_dir": "/root/rl-trader/forex-rl/ga-ness/runs/wfo/gp/20250929-202006",
+  "windows": 99,
+  "corr": {
+    "sharpe": 0.13606932917481834,
+    "cumret": 0.019176500952847623
+  },
+  "stats": {
+    "train_sharpe_mean": 8.23615603065529,
+    "val_sharpe_mean": -0.8205687420194135,
+    "train_cumret_mean": 0.03218439322207608,
+    "val_cumret_mean": -0.0006887771764162969
+  }
+}

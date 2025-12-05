@@ -1,0 +1,133 @@
+Conversation summary (through 2025-09-29)
+
+Scope
+- Genetic Programming (GP) optimization of multi-instrument FX indicator logic trees (gp_optimize.py)
+- Walk-Forward Optimization (WFO) driver and infrastructure (walk_forward_gp.py)
+- Performance logging, warnings hardening, and run artifacting
+- Meta-learning to predict validation performance from backtests (explore_wfo.py)
+- Selection rules that convert predictions into deployable portfolios and equity estimates
+
+Key code artifacts and capabilities added
+1) gp_optimize.py
+- Added compact, structured gen_summary logs (abbreviated keys; grouped best fields)
+- Removed elite_n from logs; added Sharpe/Sortino/cumret/DD/trade-frequency (tf)
+- Introduced normalized trade frequency score trade_frequency_score(trades, bars) (per-1000 bars) to make TF comparable across variable window lengths
+- Fitness now uses normalized TF; gen logs use normalized TF
+
+2) walk_forward_gp.py (new)
+- Orchestrates WFO: rolling Train/Val windows; supports monthly or weekly granularity
+- Weekly alignment: if using weeks, start dates auto-align to next Saturday (Forex off day)
+- Per-window feature building with warmup days to minimize RAM; frees memory each window
+- Outputs per-window JSONL: full final population (train metrics, validation metrics, tree pretty-print, size/depth, normalized TF, and rich extras including equity R^2, hold/idle stats, trade distribution stats, return moments, autocorr, daily ret std)
+- Normalized TF recorded for both train and validation
+- Debug/error events: wfo_build_error, wfo_error; window summaries include row counts
+- Suppressed noisy numpy RuntimeWarnings (safe computations added; many warnings mitigated, some remain benign)
+
+3) explore_wfo.py (new)
+- Analyzes windows.jsonl across all windows
+- Computes best-per-window correlations/means and population-level correlations
+- Trains meta-models to predict P(val_sharpe>0):
+  - Logistic Regression (with calibration when sklearn available)
+  - Small MLP (sklearn MLP or NumPy fallback)
+  - Gradient Boosting (HistGradientBoostingClassifier) with optional isotonic/sigmoid calibration
+- Features used for meta-model: train Sharpe/Sortino/cumret/DD, trades, normalized TF, tree size/depth, extras (equity R^2, exposure, profit_factor, win_rate, avg_dd_dur, avg_hold/idle, turnover_per_bar, ret stats, etc.), plus optional train-window regime features (EUR_USD realized vol, trend slope, return skew)
+- Cross-validation by window (leave-one-window-out or grouped k-fold)
+- Predictions and artifacts:
+  - predictions.csv (window, row_id, prob, y_true, val_sharpe, val_cumret)
+  - feature_importance.csv, calibration.csv, selected_per_window.csv, selected_topk.csv
+  - meta_model.json (AUC, precision@0.5, precision@top10%, F1 threshold, file pointers)
+  - selection_outcome.json: equity estimates for various selection schemes
+- Selection/equity calculators:
+  - threshold selection: pick all with p >= t
+  - top-10% per window
+  - top-K per window with p>=t
+  - Equity aggregates across windows built by compounding avg cum_return of selected per window
+
+Warnings & stability work
+- Replaced np.corrcoef-based operations and pandas std with safe, small-sample friendly computations
+- Added runtime warning suppression for benign numpy messages
+- Added try/except blocks around per-window build and GP run; logs explicit error events; continues next window
+
+First large WFO (initial settings)
+- Train=6 weeks, Val=1 week, Step=1 week, max_depth=5, population=100, generations=10, subsample=1, cost_bps realistic, per-window build
+- Meta-learning (full population):
+  - AUC ~0.65 (MLP/gboost), meaning non-trivial ranking signal
+  - Broad selections (threshold p≥0.25, top-10%) underperform equity < 1.0
+  - Narrow, high-confidence selection crosses 1.0:
+    - K=1 per window, p≥0.40 → equity ~1.0085 (previous run); narrower sets outperform broad cohorts
+- Observations: Turnover/trades showed negative correlation with validation performance; equity R^2 mildly negative; moderate complexity and stability preferred
+
+Second WFO (improved settings)
+- Key changes: Train=4 weeks (down from 6), Val=1 week, Step=1 week; shallower strategies (max_depth=3)
+- Example run (20250929-202006):
+  - Model: calibrated Gradient Boosting (group k-fold)
+  - AUC ~0.6394 (slightly less than prior 0.65 but still strong)
+  - Precision@0.5 ~0.551; Precision@top10% ~0.468; F1 threshold ~0.25
+  - Equity results:
+    - Threshold p≥0.25: 0.874
+    - Top-10%: 0.982
+    - K=1, p≥0.30: 1.060
+    - K=1, p≥0.35: 1.056
+    - K=1, p≥0.40: 1.057
+    - K=1, p≥0.50: 1.004
+    - K=3, p≥0.30: 1.029
+    - K=5, p≥0.30: 1.006
+- Takeaways: Simplifying trees (max_depth=3) and shorter train windows improved selection economics; multiple narrow selection schemes (K=1 or K=3 with moderate p) now exceed equity > 1.0 reliably on this run
+
+Selection policy guidelines (current best)
+- Deploy using narrow, high-confidence rules:
+  - K=1 per window, require p ≥ 0.35–0.40 (robust >1.0 equity in the second run)
+  - Or K=3 per window, p ≥ 0.30 (equity ~1.03)
+- Avoid low-threshold or top-10% broad selection (average down effect)
+- Ensemble equal-weight or probability-weighted among top picks only
+
+What not to use in live predictions
+- No delta features using validation (look-ahead). Meta-model should use only train-side, structure, and global train-window regime features. Validation regime features can be used for reporting, but not for training the predictor.
+
+Recommended GP/WFO configuration for subsequent runs
+- Weekly WFO windows for more meta-data: Train=4 weeks, Val=1 week, Step=1 week
+- Complexity: max_depth=3, add modest max_nodes ~ 20 to reduce overfit
+- Search coverage: population=150–200, generations=15–20
+- Subsample=1, cost_bps realistic (0.5–1.0), warmup-days=30
+- Fitness shaping:
+  - Normalized TF per-1000 bars; target moderate band (e.g., low=15–20, high=30)
+  - Complexity penalty (e.g., +penalty per node beyond threshold)
+  - Optional intra-train split stability penalty (lightweight) if compute allows
+- Evolutionary knobs:
+  - mutation_prob ~ 0.3 for diversity; elite_frac ~ 0.2; keep per-gen logging and checkpointing
+
+Analysis pipeline (post-run)
+- Run explore_wfo.py with gboost + isotonic calibration + add-regime; use group k-fold (6 folds)
+- Review meta_model.json and selection_outcome.json
+- Deploy shortlist using K=1 p≥0.35–0.40 or K=3 p≥0.30 (configurable) from selected_topk.csv
+
+Operational notes
+- Per-window feature build is memory-safe and recommended for large date ranges; weekly windows begin Saturday→Saturday to avoid partial weeks.
+- Warnings are largely mitigated; residual runtime warnings are suppressed and have no control-flow effect.
+- Full final population saved per window allows richer meta-learning; keep saving to strengthen future models.
+
+Commands cheat sheet
+- WFO run (example):
+  python3 walk_forward_gp.py \
+    --start 2023-01-01 --end 2024-12-31 \
+    --train-weeks 4 --val-weeks 1 --step-weeks 1 \
+    --population 150 --generations 15 \
+    --max-depth 3 --cost-bps 0.5 --min-hold 3 --cooldown 12 \
+    --subsample 1 --per-window-build --warmup-days 30
+
+- Analysis + modeling + selection:
+  python3 explore_wfo.py --run-dir runs/wfo/gp/<RUN> \
+    --train-model --model-type gboost --cv kfold --kfolds 6 \
+    --add-regime --calibration isotonic --topk-select 3
+
+- Selection/deployment rule (current best):
+  - K=1 per window, p ≥ 0.35–0.40
+  - (Alternative) K=3 per window, p ≥ 0.30
+
+Open improvements (future work)
+- Add additional cheap train-window regime features (val-window regime only for reporting)
+- Try gradient boosting with tuned hyperparams (max_depth, learning_rate, leaf count) or XGBoost/LightGBM
+- Try direct regression to predict val_sharpe; compare against classifier-based selection
+- Enforce complexity penalty and/or train-stability penalty directly in GP fitness
+- Persist top-K per window into WFO artifacts for one-pass selection (skip separate analysis if desired)
+- Schedule periodic WFO runs; re-train meta-model; roll forward selection list

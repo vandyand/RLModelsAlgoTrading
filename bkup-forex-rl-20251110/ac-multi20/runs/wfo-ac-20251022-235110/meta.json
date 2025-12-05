@@ -1,0 +1,30 @@
+{
+  "args": {
+    "start": "2023-01-01",
+    "end": "2023-03-31",
+    "train_n": 1,
+    "val_n": 1,
+    "step_n": 1,
+    "weeks": false,
+    "windows_limit": 2,
+    "instruments": "EUR_USD,AUD_USD",
+    "grans": "H1,D",
+    "epochs": 2,
+    "gamma": 0.99,
+    "actor_sigma": 0.3,
+    "entropy_coef": 0.001,
+    "lr": 0.001,
+    "hidden": 256,
+    "reward_scale": 1.0,
+    "max_grad_norm": 1.0,
+    "enter_long": 0.8,
+    "exit_long": 0.6,
+    "enter_short": 0.2,
+    "exit_short": 0.4,
+    "base_dir": "ac-multi20/runs",
+    "no_save": false,
+    "carry_forward": true,
+    "init_model": ""
+  },
+  "windows": 1
+}

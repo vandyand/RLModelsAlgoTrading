@@ -1,0 +1,68 @@
+pca-2head-update job info
+
+Overview
+- This sets up an automated cron job to run the bash script `pca-2head-update.sh` on a fixed schedule.
+- The job runs under the root user, from the repo root directory `/root/rl-trader`.
+- All stdout/stderr are appended to a log file so you can audit or troubleshoot runs.
+ - The wrapper script sources `~/.bashrc` (with a PS1 override) so exported env vars like `OANDA_DEMO_ACCOUNT_ID` and `OANDA_DEMO_KEY` are available under cron. It also supports an optional `/root/rl-trader/.secrets/oanda.env` file.
+
+Schedule
+- Runs every Sunday through Thursday at 6:24 PM America/New_York (US Eastern).
+- The cron uses `CRON_TZ=America/New_York`, so Daylight Saving Time is handled automatically.
+
+Relevant files and paths
+- Script: /root/rl-trader/pca-2head-update.sh
+- Working directory: /root/rl-trader
+- Log file: /root/rl-trader/logs/pca-2head-update.log
+
+Installed cron entry (root crontab)
+```
+# pca-2head-update: Run Sun–Thu 18:24 America/New_York
+SHELL=/bin/bash
+CRON_TZ=America/New_York
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+MAILTO=""
+
+# Minutes Hours DayOfMonth Month DayOfWeek
+24 18 * * Sun-Thu cd /root/rl-trader && /usr/bin/env bash /root/rl-trader/pca-2head-update.sh >> /root/rl-trader/logs/pca-2head-update.log 2>&1
+```
+
+Common actions
+- View the current crontab:
+```
+crontab -l
+```
+- Edit the crontab:
+```
+crontab -e
+```
+- Manually run the script now (useful for testing):
+```
+bash /root/rl-trader/pca-2head-update.sh
+```
+- Force a run bypassing the ET time guard:
+```
+bash /root/rl-trader/pca-2head-update.sh --force
+```
+- Check recent log output:
+```
+tail -n 100 /root/rl-trader/logs/pca-2head-update.log
+```
+
+Troubleshooting
+- Ensure the script is executable:
+```
+chmod +x /root/rl-trader/pca-2head-update.sh
+```
+- Check if cron is triggering the job (Ubuntu/Debian):
+```
+grep CRON /var/log/syslog | tail -n 50
+journalctl -u cron -n 100 --no-pager
+```
+- If the script relies on environment variables or virtualenvs, source them inside the script or wrap the command in the cron entry.
+ - This wrapper already sources `~/.bashrc` and will pick up exported environment variables even under cron. It also resolves the Python interpreter (prefers `/root/aid-env/bin/python3`), so `python: command not found` errors are avoided.
+- The log file can grow over time. Consider configuring log rotation (e.g., via logrotate) if needed.
+
+Notes
+- The job runs with a minimal environment. We explicitly set `PATH` in the crontab entry. If the script needs additional environment setup, add it in the script or define variables above the cron line.
+- Because `CRON_TZ` is set, the schedule is always interpreted in Eastern Time and adjusts for DST automatically.

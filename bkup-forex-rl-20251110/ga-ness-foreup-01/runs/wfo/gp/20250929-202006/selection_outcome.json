@@ -1,0 +1,42 @@
+{
+  "threshold": 0.25,
+  "equity_threshold": {
+    "equity": 0.8737612793255352,
+    "windows_no_selection": 0.0,
+    "avg_picks_per_window": 121.45454545454545
+  },
+  "equity_top10pct": {
+    "equity": 0.9816278270945726,
+    "avg_picks_per_window": 15.0
+  },
+  "equity_k1_t30": {
+    "equity": 1.0598290274738777,
+    "windows_no_selection": 0.0,
+    "avg_picks_per_window": 1.0
+  },
+  "equity_k1_t35": {
+    "equity": 1.0559408657690494,
+    "windows_no_selection": 0.0,
+    "avg_picks_per_window": 1.0
+  },
+  "equity_k1_t40": {
+    "equity": 1.0566407432068472,
+    "windows_no_selection": 0.0,
+    "avg_picks_per_window": 1.0
+  },
+  "equity_k1_t50": {
+    "equity": 1.0043812504680143,
+    "windows_no_selection": 48.0,
+    "avg_picks_per_window": 0.5151515151515151
+  },
+  "equity_k3_t30": {
+    "equity": 1.0285043182517135,
+    "windows_no_selection": 0.0,
+    "avg_picks_per_window": 3.0
+  },
+  "equity_k5_t30": {
+    "equity": 1.0057125220659606,
+    "windows_no_selection": 0.0,
+    "avg_picks_per_window": 5.0
+  }
+}

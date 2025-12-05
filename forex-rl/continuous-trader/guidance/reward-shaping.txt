@@ -1,0 +1,30 @@
+Overlapping multi-timescale hierarchical episodic rewards (design draft)
+
+Goal: 5-minute decision frequency; combine intraday (M5) episodic outcomes with higher-timescale episodic summaries (H1, D) to stabilize learning and align with longer-term performance.
+
+Design outline:
+1) Per-step shaping (M5):
+   - r_step = pnl_fraction (NAV-normalized), with optional spread rebate when fills occur
+   - Stabilize with EMA baseline (advantage): b <- beta*b + (1-beta)*r_step
+
+2) Episodic windows:
+   - Maintain overlapping windows of fixed lengths: W5 (e.g., 12 bars = 1h), W60 (1 day of M5 bars ~ 288), and W_D (daily close-based).
+   - On window close, compute robust stats from the window:
+     * pnl_sum, pnl_std, sharpe_like = mean(pnl)/std(pnl+eps)
+     * sortino_like = mean(pnl)/sqrt(mean(neg(pnl))^2 + eps)
+     * max_drawdown_fraction
+     * profit_ratio = gross_profit / (gross_loss + eps)
+     * r2_consistency = R^2 of cumulative PnL vs time index (proxy for linear growth consistency)
+     * variance penalty
+   - Compose window reward with weights and smooth clipping:
+     R_win = w_pnl*pnl_sum + w_sharpe*sharpe_like + w_sortino*sortino_like + w_dd*(1-max_drawdown) + w_consistency*r2 + w_pr*profit_ratio - w_var*var
+     Use intelligent defaults and safe guards when N_trades < threshold: fallback to pnl_sum and small bonuses, avoid blowing up on low counts.
+
+3) Hierarchical credit assignment:
+   - Add window reward to the next K steps as a decayed bonus, or treat it as an additional advantage at window boundaries.
+   - For overlapping windows, interleave the credits proportionally.
+
+4) Implementation notes:
+   - Maintain rolling deques per instrument for M5 rewards; summary buffers for H1 and D.
+   - Use robust epsilons; clamp extreme ratios.
+   - Keep default weights conservative; expose CLI to adjust.

@@ -1,0 +1,1506 @@
+{
+  "D_USD_PLN::USD/PLN_aroon_osc_5": {
+    "variance": 1.733915114374779e-33,
+    "corr": -6.163346315071655e-17,
+    "abs_corr": 6.163346315071655e-17,
+    "rank_variance": 24.5,
+    "rank_abs_corr": 1.5,
+    "ensemble_rank": 13.0
+  },
+  "D_USD_PLN::USD/PLN_bb_percB_45": {
+    "variance": 1.733915114374779e-33,
+    "corr": 6.163346315071655e-17,
+    "abs_corr": 6.163346315071655e-17,
+    "rank_variance": 24.5,
+    "rank_abs_corr": 1.5,
+    "ensemble_rank": 13.0
+  },
+  "D_USD_PLN::USD/PLN_macds_9": {
+    "variance": 3.082515758888496e-33,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_ppos_9": {
+    "variance": 3.082515758888496e-33,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_ichimoku_kijun_26": {
+    "variance": 3.082515758888496e-33,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_ha_close": {
+    "variance": 3.082515758888496e-33,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_kst": {
+    "variance": 3.082515758888496e-33,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_bb_width_15": {
+    "variance": 3.082515758888496e-33,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_trix_15": {
+    "variance": 3.082515758888496e-33,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_tsi_15": {
+    "variance": 3.082515758888496e-33,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_hma_45": {
+    "variance": 3.082515758888496e-33,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_stochd_45": {
+    "variance": 3.082515758888496e-33,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_vwap_l_45": {
+    "variance": 3.082515758888496e-33,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_tsi_45": {
+    "variance": 3.082515758888496e-33,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_stochd_135": {
+    "variance": 3.082515758888496e-33,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_bb_percB_135": {
+    "variance": 3.082515758888496e-33,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_kc_width_135": {
+    "variance": 3.082515758888496e-33,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_dc_width_135": {
+    "variance": 3.082515758888496e-33,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_adx_135": {
+    "variance": 3.082515758888496e-33,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_trix_135": {
+    "variance": 3.082515758888496e-33,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_roc_405": {
+    "variance": 3.082515758888496e-33,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_cci_405": {
+    "variance": 3.082515758888496e-33,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_aroon_osc_405": {
+    "variance": 3.082515758888496e-33,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_vwap_u_405": {
+    "variance": 3.082515758888496e-33,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_vwap_l_405": {
+    "variance": 3.082515758888496e-33,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 12.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 42.25
+  },
+  "D_USD_PLN::USD/PLN_macd_12_26": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_macdh_12_26_9": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_ppo_12_26": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_ppoh_12_26_9": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_obv_z45": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_obv_z135": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_ichimoku_spanA": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_ha_open": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_ha_high": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_ha_close_diff": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_psar": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_ema_5": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_hma_5": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_rsi_5": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_stochk_5": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_stochd_5": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_willr_5": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_hv_5": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_mfi_5": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_adx_5": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_di_plus_5": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_trix_5": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_aroon_up_5": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_aroon_down_5": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_kama_5": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_vwap_u_5": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_vwap_l_5": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_sma_15": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_ema_15": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_hma_15": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_rsi_15": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_stochk_15": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_stochd_15": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_atr_15": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_hv_15": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_bb_percB_15": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_mfi_15": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_di_minus_15": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_aroon_up_15": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_aroon_down_15": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_aroon_osc_15": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_tema_15": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_kama_15": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_vwap_15": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_vwap_u_15": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_sma_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_roc_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_rsi_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_stochk_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_cci_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_willr_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_atr_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_hv_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_bb_width_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_kc_width_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_dc_width_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_vroc_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_mfi_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_cmf_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_di_minus_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_aroon_up_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_aroon_down_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_aroon_osc_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_tema_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_kama_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_vwap_45": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_sma_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_ema_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_hma_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_roc_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_mom_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_rsi_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_stochk_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_cci_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_willr_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_atr_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_bb_width_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_vroc_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_mfi_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_cmf_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_zclose_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_di_plus_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_di_minus_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_aroon_up_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_aroon_down_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_aroon_osc_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_kama_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_vwap_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_vwap_u_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_tsi_135": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_mom_405": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_stochd_405": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_willr_405": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_atr_405": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_hv_405": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_bb_width_405": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_bb_percB_405": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_kc_width_405": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_mfi_405": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_cmf_405": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_zclose_405": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_adx_405": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_di_plus_405": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_di_minus_405": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_trix_405": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_aroon_up_405": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_tema_405": {
+    "variance": 7.70628939722124e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_tsi_405": {
+    "variance": 7.70628939722124e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 79.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 76.0
+  },
+  "D_USD_PLN::USD/PLN_cci_5": {
+    "variance": 1.92657234930531e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 137.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 104.75
+  },
+  "D_USD_PLN::USD/PLN_bb_width_5": {
+    "variance": 1.92657234930531e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 137.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 104.75
+  },
+  "D_USD_PLN::USD/PLN_vroc_5": {
+    "variance": 1.92657234930531e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 137.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 104.75
+  },
+  "D_USD_PLN::USD/PLN_cmf_5": {
+    "variance": 1.92657234930531e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 137.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 104.75
+  },
+  "D_USD_PLN::USD/PLN_di_minus_5": {
+    "variance": 1.92657234930531e-34,
+    "corr": 5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 137.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 104.75
+  },
+  "D_USD_PLN::USD/PLN_roc_15": {
+    "variance": 1.92657234930531e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 137.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 104.75
+  },
+  "D_USD_PLN::USD/PLN_vroc_405": {
+    "variance": 1.92657234930531e-34,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 137.0,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 104.75
+  },
+  "D_USD_PLN::USD/PLN_obv_z5": {
+    "variance": 1.2041077183158188e-35,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 141.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 107.0
+  },
+  "D_USD_PLN::USD/PLN_mom_5": {
+    "variance": 1.2041077183158188e-35,
+    "corr": -5.672531530189972e-17,
+    "abs_corr": 5.672531530189972e-17,
+    "rank_variance": 141.5,
+    "rank_abs_corr": 72.5,
+    "ensemble_rank": 107.0
+  },
+  "D_USD_PLN::USD/PLN_ret_1": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_obv_z15": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_obv_z405": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_ichimoku_tenkan_9": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_ichimoku_spanB": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_ha_low": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_sma_5": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_roc_5": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_atr_5": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_bb_percB_5": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_kc_width_5": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_dc_width_5": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_zclose_5": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_tema_5": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_vwap_5": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_tsi_5": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_mom_15": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_cci_15": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_willr_15": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_kc_width_15": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_dc_width_15": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_vroc_15": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_cmf_15": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_zclose_15": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_adx_15": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_di_plus_15": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_vwap_l_15": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_ema_45": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_mom_45": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_zclose_45": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_adx_45": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_di_plus_45": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_trix_45": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_vwap_u_45": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_hv_135": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_tema_135": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_vwap_l_135": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_sma_405": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_ema_405": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_hma_405": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_rsi_405": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_stochk_405": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_dc_width_405": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_aroon_down_405": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_kama_405": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  },
+  "D_USD_PLN::USD/PLN_vwap_405": {
+    "variance": 0.0,
+    "corr": 0.0,
+    "abs_corr": 0.0,
+    "rank_variance": 165.5,
+    "rank_abs_corr": 165.5,
+    "ensemble_rank": 165.5
+  }
+}

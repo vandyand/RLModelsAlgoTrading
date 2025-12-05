@@ -1,0 +1,26 @@
+{
+  "instruments": [
+    "EUR_USD",
+    "USD_JPY",
+    "GBP_USD",
+    "USD_CHF",
+    "AUD_USD",
+    "USD_CAD",
+    "NZD_USD",
+    "EUR_JPY",
+    "GBP_JPY",
+    "EUR_GBP",
+    "EUR_CHF",
+    "EUR_AUD",
+    "EUR_CAD",
+    "AUD_JPY",
+    "CHF_JPY",
+    "CAD_JPY",
+    "NZD_JPY",
+    "GBP_CHF",
+    "GBP_CAD",
+    "AUD_CAD",
+    "AUD_NZD"
+  ],
+  "instruments_csv": "EUR_USD,USD_JPY,GBP_USD,USD_CHF,AUD_USD,USD_CAD,NZD_USD,EUR_JPY,GBP_JPY,EUR_GBP,EUR_CHF,EUR_AUD,EUR_CAD,AUD_JPY,CHF_JPY,CAD_JPY,NZD_JPY,GBP_CHF,GBP_CAD,AUD_CAD,AUD_NZD"
+}

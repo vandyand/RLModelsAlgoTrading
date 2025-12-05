@@ -1,0 +1,19 @@
+{
+  "name": "bitunix-futures-api-demo",
+  "version": "1.0.0",
+  "description": "BitUnix Futures API Node.js Demo",
+  "main": "openApiHttpFuturePublic.js",
+  "scripts": {
+    "start:http:public": "node openApiHttpFuturePublic.js",
+    "start:http:private": "node openApiHttpFuturePrivate.js",
+    "start:ws:public": "node openApiWsFuturePublic.js",
+    "start:ws:private": "node openApiWsFuturePrivate.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "axios": "^1.6.7",
+    "ws": "^8.16.0"
+  },
+  "author": "",
+  "license": "MIT"
+} 

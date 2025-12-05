@@ -1,0 +1,13 @@
+Excellent. Yes, we'll need to update imports etc for all imports that are a level │
+ │    up in the dir tree. Basically we want to simplify both the gp_optimize script    │
+ │   and the walk forward script. We want to get rid of the tree strategy type in the  │
+ │   gp_optimize script and support only the nn strategy type. Also, we want to use    │
+ │   the ballast fitness function by default but keep the option of getting a fitness  │
+ │   function passed in from walk forward. In walk forward we want to get rid of the   │
+ │   linear learned fitness function and support only the nn learned fitness function  │
+ │   and by default we don't want to have any learned fitness function so the gp can   │
+ │   simply use whatever function it's set up with (which we want to use the ballast   │
+ │   one by default here now). There are many cli args associated with these           │
+ │   depreciated functionalities that we can get rid of (and thus simplify the         │
+ │   scripts). Get rid of all the obvious ones and ask if you're not sure about any    │
+ │   and I'll provide feedback. Thanks!

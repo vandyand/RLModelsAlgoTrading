@@ -1,0 +1,81 @@
+{
+  "event": "wfo_model",
+  "run_dir": "runs/wfo/gp/20250929-202006",
+  "model": "gboost",
+  "auc": 0.6394048778127109,
+  "precision@0.5": 0.5505050505050505,
+  "precision@top10%": 0.46801346801346805,
+  "threshold_f1": 0.25,
+  "coef_top_pos": [
+    [
+      "train_sharpe",
+      0.0
+    ],
+    [
+      "train_sortino",
+      0.0
+    ],
+    [
+      "train_cumret",
+      0.0
+    ],
+    [
+      "train_dd",
+      0.0
+    ],
+    [
+      "trades_train",
+      0.0
+    ],
+    [
+      "tf_train",
+      0.0
+    ],
+    [
+      "tree_size",
+      0.0
+    ],
+    [
+      "tree_depth",
+      0.0
+    ]
+  ],
+  "coef_top_neg": [
+    [
+      "train_sharpe",
+      0.0
+    ],
+    [
+      "train_sortino",
+      0.0
+    ],
+    [
+      "train_cumret",
+      0.0
+    ],
+    [
+      "train_dd",
+      0.0
+    ],
+    [
+      "trades_train",
+      0.0
+    ],
+    [
+      "tf_train",
+      0.0
+    ],
+    [
+      "tree_size",
+      0.0
+    ],
+    [
+      "tree_depth",
+      0.0
+    ]
+  ],
+  "pred_csv": "runs/wfo/gp/20250929-202006/predictions.csv",
+  "coef_csv": "runs/wfo/gp/20250929-202006/feature_importance.csv",
+  "calib_csv": "runs/wfo/gp/20250929-202006/calibration.csv",
+  "select_csv": "runs/wfo/gp/20250929-202006/selected_per_window.csv"
+}

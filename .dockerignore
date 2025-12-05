@@ -1,0 +1,6 @@
+*
+!local-broker/
+local-broker/broker-data
+local-broker/tmp
+.git
+.github

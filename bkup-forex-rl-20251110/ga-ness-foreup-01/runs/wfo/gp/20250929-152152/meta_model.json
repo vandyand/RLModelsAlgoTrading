@@ -1,0 +1,81 @@
+{
+  "event": "wfo_model",
+  "run_dir": "/root/rl-trader/forex-rl/ga-ness/runs/wfo/gp/20250929-152152",
+  "model": "gboost",
+  "auc": 0.656155366793699,
+  "precision@0.5": 0.44941176470588234,
+  "precision@top10%": 0.43505154639175253,
+  "threshold_f1": 0.25,
+  "coef_top_pos": [
+    [
+      "train_sharpe",
+      0.0
+    ],
+    [
+      "train_sortino",
+      0.0
+    ],
+    [
+      "train_cumret",
+      0.0
+    ],
+    [
+      "train_dd",
+      0.0
+    ],
+    [
+      "trades_train",
+      0.0
+    ],
+    [
+      "tf_train",
+      0.0
+    ],
+    [
+      "tree_size",
+      0.0
+    ],
+    [
+      "tree_depth",
+      0.0
+    ]
+  ],
+  "coef_top_neg": [
+    [
+      "train_sharpe",
+      0.0
+    ],
+    [
+      "train_sortino",
+      0.0
+    ],
+    [
+      "train_cumret",
+      0.0
+    ],
+    [
+      "train_dd",
+      0.0
+    ],
+    [
+      "trades_train",
+      0.0
+    ],
+    [
+      "tf_train",
+      0.0
+    ],
+    [
+      "tree_size",
+      0.0
+    ],
+    [
+      "tree_depth",
+      0.0
+    ]
+  ],
+  "pred_csv": "/root/rl-trader/forex-rl/ga-ness/runs/wfo/gp/20250929-152152/predictions.csv",
+  "coef_csv": "/root/rl-trader/forex-rl/ga-ness/runs/wfo/gp/20250929-152152/feature_importance.csv",
+  "calib_csv": "/root/rl-trader/forex-rl/ga-ness/runs/wfo/gp/20250929-152152/calibration.csv",
+  "select_csv": "/root/rl-trader/forex-rl/ga-ness/runs/wfo/gp/20250929-152152/selected_per_window.csv"
+}

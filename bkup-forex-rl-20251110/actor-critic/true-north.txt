@@ -1,0 +1,155 @@
+Actor-Critic Multi-Instrument Online Trading System: Technical Design
+
+Objectives
+- Build a single online-learning system that trades an arbitrary set of FX instruments in parallel.
+- Use a shared representation learner with attention for cross-instrument context, and per-instrument actor/critic heads.
+- Execute “box trades” per instrument:
+  - Entry controlled by an explicit enter gate
+  - Direction, magnitude, TP pips, SL pips, and max holding time predicted at entry
+  - Exit on TP/SL or deadline; episodic reward credited to the entry decision
+- Incorporate multi-timescale features:
+  - Tick-level (including DOM signals)
+  - Hourly and daily features from OANDA REST candles
+  - Cross-instrument relationships
+
+High-Level Architecture
+- Data flow:
+  1. PricingStream tick events for all selected instruments in one stream
+  2. Periodic OANDA REST fetch for H1 and D candles per instrument (initial backfill + refresh)
+  3. Feature builder per instrument:
+     - Tick + DOM features
+     - Hourly features
+     - Daily features
+     - Cross-instrument features
+  4. Shared encoder (autoencoder) produces latent per instrument
+  5. Cross-instrument attention over instrument latents
+  6. Per-instrument heads:
+     - Actor (6 outputs): enter_prob, direction, magnitude, tp_pips, sl_pips, max_time_sec
+     - Critic: value estimate
+  7. Execution:
+     - If flat and enter gate is true, open a box trade with TP/SL and deadline
+     - Track open/close; on close compute episodic return
+  8. Learning:
+     - Actor-critic (A2C) update at episode close using advantage
+     - Optional auxiliary loss: autoencoder reconstruction (stabilize representation)
+- Checkpointing:
+  - Save shared encoder, attention, per-instrument actor/critic heads, optimizer states, and hyperparameters
+  - Allow resume and continued online learning
+
+Instruments and State Management
+- Accept --instruments comma-separated list.
+- For each instrument:
+  - Rolling tick mid deque; rolling DOM stats
+  - H1 and D candle deques (from REST)
+  - Box trade state: open/flat, entry features/logits, entry NAV, deadline, last order time
+  - Per-instrument actor and critic heads (shared encoder/attention are common)
+
+Features (per instrument)
+- Tick-level (updated every tick):
+  - Price returns: r1, r5, r20 in tick units: r_k = log(mid_t / mid_{t−k})
+  - Rolling mean/std of 1-tick returns over windows {5, 20, 60}
+  - SMA20 z-score of price; realized volatility over last 60 ticks
+  - Spread and spread z-score (vs rolling baseline)
+  - DOM (order book) features from PricingStream bids/asks:
+    - Top-K (e.g., K=5) liquidity sums: sum_liq_bid_K, sum_liq_ask_K
+    - Imbalance = (Σbid_K − Σask_K)/(Σbid_K + Σask_K)
+    - Depth-weighted price tilt: avg_bid_price_K − avg_ask_price_K (weighted by liquidity)
+    - Microprice = (ask*bid_liq + bid*ask_liq)/(bid_liq+ask_liq) and Δ microprice
+    - Order flow imbalance: ΔΣbid_K, ΔΣask_K vs rolling averages
+- Hourly (H1) bars from REST:
+  - Last bar return, 5- and 20-bar returns (log)
+  - Std of returns over {5, 20, 60}
+  - ATR(14 or 20), price vs rolling max/min(20/60)
+  - Volume features: volume z-scores, moving averages, volume spikes
+- Daily (D) bars from REST:
+  - Same pattern as H1 (returns, std, ATR, breakouts, volume)
+- Cross-instrument features:
+  - Peer returns (tick/H1/D); relative strength (z-score differences)
+  - Rolling correlation and β (e.g., over 60 ticks; 60 H1 bars) between target and peers
+  - Optionally, pairwise spread change and rank-based momentum
+- Normalization:
+  - Use rolling z-scores within each timeframe and feature family
+  - Clip extremes (e.g., to [-5, 5])
+
+Model
+- Shared encoder:
+  - Autoencoder: encoder E maps raw features x_i to latent h_i; decoder reconstructs x̂_i
+  - Reconstruction loss λ_rec * ||x_i − x̂_i|| enhances stability and encourages useful representation
+- Attention:
+  - Multi-head self-attention over the set {h_i} across instruments
+  - Output contextualized latents c_i
+- Heads per instrument:
+  - Actor head: 6 outputs per instrument
+    - enter_prob (sigmoid) → boolean gate
+    - direction (tanh) ∈ [-1, 1]
+    - magnitude (sigmoid) ∈ (0,1) → units = magnitude × max_units
+    - tp_pips, sl_pips (sigmoid scaled to [min,max])
+    - max_time_sec (sigmoid scaled to [min,max])
+  - Critic head: scalar value V_i (expected return baseline)
+- Losses:
+  - Advantage actor-critic:
+    - episodic return G_i at box close (TP/SL/deadline), advantage A_i = G_i − V_i
+    - actor loss = −A_i * log π_i(entry | state) + entropy bonus (esp. on enter head)
+    - critic loss = (G_i − V_i)^2
+  - Autoencoder reconstruction: λ_rec * MSE(x_i, x̂_i)
+- Optimizer: Adam with small LR; gradient clipping
+- Exploration: small entropy bonus; Gaussian noise on actor logits (annealed); nonzero exploration floor
+
+Execution Logic (per instrument)
+- Entry:
+  - If flat and cooldown passed, compute actor outputs; if enter is true and |units| ≥ min_units:
+    - Submit market order with TP/SL; record entry features/logits, NAV, and deadline
+- Close:
+  - If TP/SL fills (position flat) or deadline reached, close box:
+    - Compute episodic return G_i = (NAV_close − NAV_entry)/NAV_entry
+    - Apply A2C update (actor+critic) using entry state/logits and G_i
+    - Clear box state
+- Safety:
+  - Per-instrument cooldown after order
+  - Optional daily loss cap pause (future)
+  - Portfolio exposure cap (future)
+
+Data and Refresh Strategy
+- PricingStream: each PRICE tick updates tick and DOM features for that instrument
+- REST candles (H1/D):
+  - On startup, backfill e.g. last 60 bars for H1 and D
+  - Periodically refresh (e.g., every minute for H1; every 5 minutes for D), fetching the last 1–3 bars; include incomplete current bars (OANDA supports includeFirst)
+  - Update candle deques and recompute candle-based features
+- Cross-instrument features:
+  - Built from the current feature caches; ensure all instruments’ windows are ready before using pair stats (fall back to zeros otherwise)
+
+Checkpointing
+- Save:
+  - Shared encoder and decoder weights
+  - Attention weights
+  - Per-instrument actor/critic heads
+  - Optimizer states and noise sigma
+  - Config snapshot (instruments list, feature toggles)
+- Load:
+  - If shapes match, restore; otherwise initialize compatible parts
+
+CLI and Config
+- Key flags:
+  - --instruments
+  - --max-units, --min-units, --order-cooldown
+  - --min-tp-pips, --max-tp-pips, --min-sl-pips, --max-sl-pips
+  - --min-trade-sec, --max-trade-sec
+  - --feature-ticks (tick windows); H1/D lengths fixed (e.g., 60) or flags
+  - DOM depth K (e.g., --dom-depth 5)
+  - Cross-instrument options (enable/disable, correlation window)
+  - Learning rates, entropy/reg coefficients, λ_rec
+  - Autosave interval and model path
+  - NAV/position refresh intervals
+- Dependencies: torch, numpy, requests, oandapyV20
+
+Roadmap
+1) Scaffold multi_inst_actor_critic.py:
+  - Stream + REST backfill for H1/D
+  - Feature builders (tick/DOM/H1/D, cross-instrument)
+  - Shared encoder, attention, per-instrument heads (actor/critic)
+  - Box trade executor and episodic A2C updates
+  - Checkpointing and config
+2) Validate with 2 instruments (EUR_USD, USD_JPY), then scale to 5+
+3) Iterate feature set (add/remove signals), tune windows and weights
+4) Add risk controls and portfolio constraints
+5) Consider replay buffer and target networks for added stability

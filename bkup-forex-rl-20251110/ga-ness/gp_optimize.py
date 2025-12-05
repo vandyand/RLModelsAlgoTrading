@@ -1,0 +1,1191 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import json
+import math
+import os
+import random
+from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+import time
+
+import numpy as np
+import pandas as pd
+
+from multi_features import build_features, INSTRUMENTS
+
+
+# ---- NN genome (alternative strategy representation) ----
+@dataclass
+class NNGenome:
+    # Architecture excludes the final 1-unit output; use hidden layer sizes
+    arch: List[int]
+    # Weights and biases for each layer in order (including final output layer)
+    # weights[i]: shape (in_dim_i, out_dim_i), biases[i]: shape (out_dim_i,)
+    weights: List[np.ndarray]
+    biases: List[np.ndarray]
+    # Optional learned affine transform on inputs: x' = x * scale + bias
+    # If None, use inputs as-is (assumes rolling normalization handled upstream)
+    input_scale: Optional[np.ndarray] = None
+    input_bias: Optional[np.ndarray] = None
+
+
+def _nn_param_count(g: NNGenome) -> int:
+    params = 0
+    for w, b in zip(g.weights, g.biases):
+        params += int(w.size + b.size)
+    if g.input_scale is not None:
+        params += int(g.input_scale.size)
+    if g.input_bias is not None:
+        params += int(g.input_bias.size)
+    return params
+
+
+def _nn_clone(g: NNGenome) -> NNGenome:
+    return NNGenome(
+        arch=list(g.arch),
+        weights=[w.copy() for w in g.weights],
+        biases=[b.copy() for b in g.biases],
+        input_scale=(g.input_scale.copy() if g.input_scale is not None else None),
+        input_bias=(g.input_bias.copy() if g.input_bias is not None else None),
+    )
+
+
+def _nn_init(input_dim: int, arch: List[int], use_affine: bool) -> NNGenome:
+    layers: List[int] = list(arch) + [1]
+    dims = [input_dim] + layers
+    rng = np.random.default_rng()
+    weights: List[np.ndarray] = []
+    biases: List[np.ndarray] = []
+    for i in range(len(dims) - 1):
+        fan_in = int(dims[i]); fan_out = int(dims[i + 1])
+        # Kaiming/He for hidden; smaller for the final layer to reduce saturation
+        if i < len(dims) - 2:
+            scale = np.sqrt(2.0 / max(1, fan_in))
+        else:
+            scale = np.sqrt(1.0 / max(1, fan_in))
+        W = (rng.standard_normal((fan_in, fan_out)).astype(np.float32)) * float(scale)
+        b = np.zeros((fan_out,), dtype=np.float32)
+        weights.append(W)
+        biases.append(b)
+    input_scale = np.ones((input_dim,), dtype=np.float32) if use_affine else None
+    input_bias = np.zeros((input_dim,), dtype=np.float32) if use_affine else None
+    return NNGenome(arch=list(arch), weights=weights, biases=biases, input_scale=input_scale, input_bias=input_bias)
+
+
+def _nn_forward(g: NNGenome, X: pd.DataFrame, feature_names: List[str], input_norm: str = "rolling") -> np.ndarray:
+    # Extract ordered features
+    Xt = X[feature_names].to_numpy(dtype=np.float32, copy=False)
+    if input_norm == "affine":
+        # Learned affine scaling per feature
+        if g.input_scale is not None:
+            Xt = Xt * g.input_scale
+        if g.input_bias is not None:
+            Xt = Xt + g.input_bias
+    # MLP forward: ReLU hidden, sigmoid output
+    H = Xt
+    L = len(g.weights)
+    for i in range(L):
+        W = g.weights[i]; b = g.biases[i]
+        Z = H @ W + b
+        if i < L - 1:
+            # ReLU with clipping to bound activations and avoid blow-up
+            H = np.minimum(20.0, np.maximum(0.0, Z))
+        else:
+            # final sigmoid to [0,1) with overflow-safe formulation
+            # Use tanh-based sigmoid: 0.5 * (1 + tanh(z/2)) for numerical stability
+            H = 0.5 * (1.0 + np.tanh(0.5 * Z))
+    out = H.reshape(-1)
+    # Ensure strictly < 1.0 for safety
+    out = np.clip(out, 0.0, np.nextafter(1.0, 0.0))
+    return out.astype(np.float32, copy=False)
+
+
+def positions_from_nn_hysteresis(
+    out_vals: np.ndarray,
+) -> pd.Series:
+    # Map continuous output to long/short with hysteresis thresholds
+    state = 0
+    out = np.zeros(len(out_vals), dtype=float)
+    for i, v in enumerate(out_vals):
+        if state == 0:
+            if v > 0.7:
+                state = 1
+            elif v < 0.3:
+                state = -1
+        elif state == 1:
+            if v < 0.6:
+                state = 0
+        elif state == -1:
+            if v > 0.4:
+                state = 0
+        out[i] = float(state)
+    # Use position decided at t-1 for return at t
+    return pd.Series(out).shift(1).fillna(0.0)
+
+
+def _nn_mutate(g: NNGenome, p_mut: float, w_sigma: float, aff_sigma: float) -> NNGenome:
+    rng = np.random.default_rng()
+    out = _nn_clone(g)
+    # Mutate weights/biases with Gaussian noise
+    for i in range(len(out.weights)):
+        if rng.random() < p_mut:
+            noise = rng.standard_normal(out.weights[i].shape).astype(np.float32) * float(w_sigma)
+            out.weights[i] = out.weights[i] + noise
+        if rng.random() < p_mut:
+            bnoise = rng.standard_normal(out.biases[i].shape).astype(np.float32) * float(w_sigma)
+            out.biases[i] = out.biases[i] + bnoise
+        # Clip to keep parameters in a sane range (mitigates overflow, speeds convergence)
+        out.weights[i] = np.clip(out.weights[i], -5.0, 5.0)
+        out.biases[i] = np.clip(out.biases[i], -5.0, 5.0)
+    # Mutate input affine if present
+    if out.input_scale is not None and rng.random() < p_mut:
+        out.input_scale = out.input_scale + (rng.standard_normal(out.input_scale.shape).astype(np.float32) * float(aff_sigma))
+    if out.input_bias is not None and rng.random() < p_mut:
+        out.input_bias = out.input_bias + (rng.standard_normal(out.input_bias.shape).astype(np.float32) * float(aff_sigma))
+    # Keep affine parameters bounded
+    if out.input_scale is not None:
+        out.input_scale = np.clip(out.input_scale, 0.05, 20.0)
+    if out.input_bias is not None:
+        out.input_bias = np.clip(out.input_bias, -5.0, 5.0)
+    return out
+
+
+def _nn_crossover(a: NNGenome, b: NNGenome) -> Tuple[NNGenome, NNGenome]:
+    # Uniform crossover per parameter (requires same shapes)
+    assert len(a.weights) == len(b.weights)
+    rng = np.random.default_rng()
+    c1 = _nn_clone(a)
+    c2 = _nn_clone(b)
+    for i in range(len(a.weights)):
+        Wa = a.weights[i]; Wb = b.weights[i]
+        Ba = a.biases[i]; Bb = b.biases[i]
+        mask_w = rng.random(Wa.shape) < 0.5
+        mask_b = rng.random(Ba.shape) < 0.5
+        c1.weights[i] = np.where(mask_w, Wa, Wb).astype(np.float32, copy=False)
+        c2.weights[i] = np.where(mask_w, Wb, Wa).astype(np.float32, copy=False)
+        c1.biases[i] = np.where(mask_b, Ba, Bb).astype(np.float32, copy=False)
+        c2.biases[i] = np.where(mask_b, Bb, Ba).astype(np.float32, copy=False)
+    # Affine
+    if a.input_scale is not None and b.input_scale is not None:
+        mask = rng.random(a.input_scale.shape) < 0.5
+        c1.input_scale = np.where(mask, a.input_scale, b.input_scale).astype(np.float32, copy=False)
+        c2.input_scale = np.where(mask, b.input_scale, a.input_scale).astype(np.float32, copy=False)
+    if a.input_bias is not None and b.input_bias is not None:
+        mask = rng.random(a.input_bias.shape) < 0.5
+        c1.input_bias = np.where(mask, a.input_bias, b.input_bias).astype(np.float32, copy=False)
+        c2.input_bias = np.where(mask, b.input_bias, a.input_bias).astype(np.float32, copy=False)
+    return c1, c2
+
+
+def _nn_pretty(g: NNGenome, input_dim: int) -> str:
+    return f"NN[inputs={input_dim}, arch={'-'.join(map(str, g.arch + [1]))}, params={_nn_param_count(g)}]"
+
+
+def _nn_to_dict(g: NNGenome) -> Dict[str, Any]:
+    return {
+        "arch": list(g.arch),
+        "weights": [w.astype(float).tolist() for w in g.weights],
+        "biases": [b.astype(float).tolist() for b in g.biases],
+        "input_scale": (g.input_scale.astype(float).tolist() if g.input_scale is not None else None),
+        "input_bias": (g.input_bias.astype(float).tolist() if g.input_bias is not None else None),
+    }
+
+
+# ---- GP nodes ----
+@dataclass
+class Node:
+    pass
+
+@dataclass
+class Feature(Node):
+    name: str  # column in X
+
+@dataclass
+class Threshold(Node):
+    value: float
+
+@dataclass
+class UnaryOp(Node):
+    op: str  # 'NOT'
+    child: Node
+
+@dataclass
+class BinaryOp(Node):
+    op: str  # 'AND','OR','>','<'
+    left: Node
+    right: Node
+
+
+@dataclass
+class ConstBool(Node):
+    value: bool
+
+
+def node_size(n: Node) -> int:
+    if isinstance(n, (Feature, Threshold)):
+        return 1
+    if isinstance(n, UnaryOp):
+        return 1 + node_size(n.child)
+    if isinstance(n, BinaryOp):
+        return 1 + node_size(n.left) + node_size(n.right)
+    return 1
+
+
+def node_depth(n: Node) -> int:
+    if isinstance(n, (Feature, Threshold)):
+        return 1
+    if isinstance(n, UnaryOp):
+        return 1 + node_depth(n.child)
+    if isinstance(n, BinaryOp):
+        return 1 + max(node_depth(n.left), node_depth(n.right))
+    return 1
+
+
+def pretty(n: Node) -> str:
+    if isinstance(n, Feature):
+        return n.name
+    if isinstance(n, Threshold):
+        return f"{n.value:.4f}"
+    if isinstance(n, UnaryOp):
+        return f"({n.op} {pretty(n.child)})"
+    if isinstance(n, BinaryOp):
+        return f"({pretty(n.left)} {n.op} {pretty(n.right)})"
+    if isinstance(n, ConstBool):
+        return "TRUE" if n.value else "FALSE"
+    return "?"
+
+
+def clone_node(n: Optional[Node]) -> Optional[Node]:
+    if n is None:
+        return None
+    if isinstance(n, Feature):
+        return Feature(name=n.name)
+    if isinstance(n, Threshold):
+        return Threshold(value=float(n.value))
+    if isinstance(n, UnaryOp):
+        return UnaryOp(op=n.op, child=clone_node(n.child))
+    if isinstance(n, BinaryOp):
+        return BinaryOp(op=n.op, left=clone_node(n.left), right=clone_node(n.right))
+    return None
+
+
+def clone_individual(ind: Tuple[Node, Node, Optional[Node], Optional[Node]]) -> Tuple[Node, Node, Optional[Node], Optional[Node]]:
+    return (
+        clone_node(ind[0]),
+        clone_node(ind[1]),
+        clone_node(ind[2]),
+        clone_node(ind[3]),
+    )  # type: ignore[return-value]
+
+
+# ---- Node (de)serialization ----
+def node_to_dict(n: Optional[Node]) -> Optional[Dict[str, Any]]:
+    if n is None:
+        return None
+    if isinstance(n, Feature):
+        return {"type": "Feature", "name": n.name}
+    if isinstance(n, Threshold):
+        return {"type": "Threshold", "value": n.value}
+    if isinstance(n, UnaryOp):
+        return {"type": "UnaryOp", "op": n.op, "child": node_to_dict(n.child)}
+    if isinstance(n, BinaryOp):
+        return {"type": "BinaryOp", "op": n.op, "left": node_to_dict(n.left), "right": node_to_dict(n.right)}
+    if isinstance(n, ConstBool):
+        return {"type": "ConstBool", "value": bool(n.value)}
+    return None
+
+
+def node_from_dict(d: Optional[Dict[str, Any]]) -> Optional[Node]:
+    if d is None:
+        return None
+    t = d.get("type")
+    if t == "Feature":
+        return Feature(name=d["name"])  # type: ignore[arg-type]
+    if t == "Threshold":
+        return Threshold(value=float(d["value"]))  # type: ignore[arg-type]
+    if t == "UnaryOp":
+        return UnaryOp(op=d["op"], child=node_from_dict(d.get("child")))  # type: ignore[arg-type]
+    if t == "BinaryOp":
+        return BinaryOp(op=d["op"], left=node_from_dict(d.get("left")), right=node_from_dict(d.get("right")))  # type: ignore[arg-type]
+    if t == "ConstBool":
+        return ConstBool(value=bool(d.get("value", False)))  # type: ignore[arg-type]
+    return None
+
+
+# ---- GP generation ----
+OPS_BOOL = ["AND", "OR"]
+OPS_CMP = [">", "<"]
+OPS_UN = ["NOT"]
+
+
+def random_feature(feature_names: List[str]) -> Feature:
+    return Feature(name=random.choice(feature_names))
+
+
+def random_threshold() -> Threshold:
+    # Features are z-scored; thresholds in (-3, 3)
+    return Threshold(value=random.uniform(-2.5, 2.5))
+
+
+def random_tree(feature_names: List[str], max_depth: int) -> Node:
+    if max_depth <= 1:
+        # base case: comparison
+        return BinaryOp(op=random.choice(OPS_CMP), left=random_feature(feature_names), right=random_threshold())
+    # build boolean composition of sub-comparisons
+    if random.random() < 0.2:
+        # unary NOT
+        return UnaryOp(op="NOT", child=random_tree(feature_names, max_depth - 1))
+    return BinaryOp(
+        op=random.choice(OPS_BOOL),
+        left=random_tree(feature_names, max_depth - 1),
+        right=random_tree(feature_names, max_depth - 1),
+    )
+
+
+def mutate(node: Node, feature_names: List[str], max_depth: int, p_mut: float = 0.2) -> Node:
+    # Work on a deep copy to avoid mutating parents/elites by reference
+    node = clone_node(node)  # type: ignore[assignment]
+    if random.random() > p_mut:
+        return node  # type: ignore[return-value]
+    # random replacement at a node
+    if isinstance(node, Feature) and random.random() < 0.5:
+        return random_feature(feature_names)
+    if isinstance(node, Threshold) and random.random() < 0.5:
+        return random_threshold()
+    if isinstance(node, BinaryOp):
+        if random.random() < 0.3:
+            node.op = random.choice(OPS_BOOL if node.op in OPS_BOOL else OPS_CMP)
+        node.left = mutate(node.left, feature_names, max_depth - 1, p_mut)
+        node.right = mutate(node.right, feature_names, max_depth - 1, p_mut)
+        return node
+    if isinstance(node, UnaryOp):
+        if random.random() < 0.3:
+            node.op = "NOT"
+        node.child = mutate(node.child, feature_names, max_depth - 1, p_mut)
+        return node
+    # fallback: grow a new subtree
+    return random_tree(feature_names, max_depth)
+
+
+def simplify_const(n: Node) -> Node:
+    # Constant folding and pruning of obvious TRUE/FALSE expressions
+    if isinstance(n, UnaryOp):
+        child = simplify_const(n.child)
+        if isinstance(child, ConstBool):
+            return ConstBool(value=(not child.value))
+        return UnaryOp(op=n.op, child=child)
+    if isinstance(n, BinaryOp):
+        left = simplify_const(n.left)
+        right = simplify_const(n.right)
+        # If both sides are consts
+        if isinstance(left, ConstBool) and isinstance(right, ConstBool):
+            if n.op in OPS_BOOL:
+                return ConstBool(value=(left.value and right.value) if n.op == 'AND' else (left.value or right.value))
+            # Compare booleans: True/False converted to 1/0 semantics
+            lnum = 1.0 if left.value else 0.0
+            rnum = 1.0 if right.value else 0.0
+            return ConstBool(value=(lnum > rnum) if n.op == '>' else (lnum < rnum))
+        # If left is const and op is AND/OR
+        if isinstance(left, ConstBool) and n.op in OPS_BOOL:
+            if n.op == 'AND':
+                return right if left.value else ConstBool(False)
+            else:
+                return ConstBool(True) if left.value else right
+        if isinstance(right, ConstBool) and n.op in OPS_BOOL:
+            if n.op == 'AND':
+                return left if right.value else ConstBool(False)
+            else:
+                return ConstBool(True) if right.value else left
+        return BinaryOp(op=n.op, left=left, right=right)
+    return n
+
+
+def individual_key(ind: Tuple[Node, Node, Optional[Node], Optional[Node]]) -> str:
+    # Structural uniqueness key
+    return json.dumps({
+        'el': node_to_dict(ind[0]), 'es': node_to_dict(ind[1]),
+        'xl': node_to_dict(ind[2]), 'xs': node_to_dict(ind[3])
+    }, sort_keys=True)
+
+
+def crossover(a: Node, b: Node) -> Tuple[Node, Node]:
+    # Simple: swap left/right subtrees if both BinaryOps; else return clones
+    if isinstance(a, BinaryOp) and isinstance(b, BinaryOp):
+        if random.random() < 0.5:
+            return BinaryOp(a.op, b.left, a.right), BinaryOp(b.op, a.left, b.right)
+        else:
+            return BinaryOp(a.op, a.left, b.right), BinaryOp(b.op, b.left, a.right)
+    return a, b
+
+
+# ---- Evaluation ----
+
+def eval_node_vec(n: Node, X: pd.DataFrame) -> pd.Series:
+    # Vectorized evaluation returning boolean Series
+    if isinstance(n, BinaryOp):
+        if n.op in OPS_BOOL:
+            ls = eval_node_vec(n.left, X).astype(bool)
+            rs = eval_node_vec(n.right, X).astype(bool)
+            return (ls & rs) if n.op == "AND" else (ls | rs)
+        # Comparison
+        if isinstance(n.left, Feature) and isinstance(n.right, Threshold):
+            return (X[n.left.name] > n.right.value) if n.op == ">" else (X[n.left.name] < n.right.value)
+        if isinstance(n.left, Threshold) and isinstance(n.right, Feature):
+            return (n.left.value > X[n.right.name]) if n.op == ">" else (n.left.value < X[n.right.name])
+        # Fallback generic
+        l = X[getattr(n.left, 'name', '')] if isinstance(n.left, Feature) else pd.Series(getattr(n.left, 'value', 0.0), index=X.index)
+        r = X[getattr(n.right, 'name', '')] if isinstance(n.right, Feature) else pd.Series(getattr(n.right, 'value', 0.0), index=X.index)
+        return (l > r) if n.op == ">" else (l < r)
+    if isinstance(n, UnaryOp):
+        return ~eval_node_vec(n.child, X)
+    if isinstance(n, ConstBool):
+        return pd.Series(bool(n.value), index=X.index)
+    # Leaf nodes shouldn't be evaluated directly in vector mode; return False
+    return pd.Series(False, index=X.index)
+
+
+def positions_from_tree_three_state(
+    entry_long: Node,
+    entry_short: Node,
+    exit_long: Optional[Node],
+    exit_short: Optional[Node],
+    X: pd.DataFrame,
+    min_hold_candles: int = 3,
+    cooldown_candles: int = 12,
+) -> pd.Series:
+    # Compute signals vectorized first, then run a simple O(N) FSM
+    gl = eval_node_vec(entry_long, X).to_numpy(dtype=bool)
+    gs = eval_node_vec(entry_short, X).to_numpy(dtype=bool)
+    xl = eval_node_vec(exit_long, X).to_numpy(dtype=bool) if exit_long is not None else np.zeros(len(X), dtype=bool)
+    xs = eval_node_vec(exit_short, X).to_numpy(dtype=bool) if exit_short is not None else np.zeros(len(X), dtype=bool)
+
+    state = 0
+    hold = 0
+    cooldown = 0
+    out = np.zeros(len(X), dtype=float)
+    for i in range(len(X)):
+        if cooldown > 0:
+            cooldown -= 1
+        if state != 0:
+            hold += 1
+        else:
+            hold = 0
+
+        if state == 0:
+            if cooldown == 0:
+                if gl[i]:
+                    state = 1
+                    hold = 0
+                elif gs[i]:
+                    state = -1
+                    hold = 0
+        elif state == 1:
+            if hold >= min_hold_candles and (xl[i] or gs[i]):
+                state = 0
+                cooldown = cooldown_candles
+        elif state == -1:
+            if hold >= min_hold_candles and (xs[i] or gl[i]):
+                state = 0
+                cooldown = cooldown_candles
+        out[i] = float(state)
+    pos = pd.Series(out, index=X.index)
+    return pos.shift(1).fillna(0.0)
+
+
+# ---- Metrics ----
+from backtest_simple_strategy import evaluate_strategy, StrategyParams  # reuse metrics impl
+
+
+def metrics_from_positions(close: pd.Series, pos: pd.Series, cost_bps: float = 1.0) -> Dict[str, float]:
+    ret = close.pct_change().fillna(0.0)
+    strat_ret = pos * ret
+    cost = float(cost_bps) * 1e-4
+    if cost > 0:
+        trade_flag = pos.ne(pos.shift(1)).fillna(False)
+        strat_ret[trade_flag] = strat_ret[trade_flag] - cost
+    equity = (1.0 + strat_ret).cumprod()
+    cum_return = float(equity.iloc[-1] - 1.0) if len(equity) > 0 else 0.0
+    # Safe std computations (avoid ddof warnings on small samples)
+    vals = strat_ret.values
+    vol = float(np.std(vals, ddof=1)) if len(vals) > 1 else 0.0
+    mean_ret = float(np.mean(vals)) if len(vals) > 0 else 0.0
+    sharpe = float((mean_ret / vol) * np.sqrt(252 * 288)) if vol > 1e-12 else 0.0
+    neg_vals = vals[vals < 0.0]
+    dstd = float(np.std(neg_vals, ddof=1)) if len(neg_vals) > 1 else 0.0
+    sortino = float((strat_ret.mean() / dstd) * np.sqrt(252 * 288)) if dstd > 1e-12 else 0.0
+    running_max = equity.cummax()
+    drawdown = (equity / running_max - 1.0).fillna(0.0)
+    max_dd = float(drawdown.min()) if len(drawdown) > 0 else 0.0
+    trades = int(pos.ne(pos.shift(1)).sum())
+    return {"cum_return": cum_return, "sharpe": sharpe, "sortino": sortino, "max_drawdown": max_dd, "trades": float(trades)}
+
+
+# ---- Trade frequency normalization ----
+def trade_frequency_score(trades: int, bars: int, low: float = 10.0, high: float = 25.0, max_ok: float = 50.0) -> float:
+    """Score trade frequency in [0,1] normalized by sample length.
+    Computes trades per 1000 bars, targets [low, high] as ideal band.
+    """
+    if bars <= 0:
+        return 0.0
+    per_k = (float(trades) * 4000.0) / float(bars)
+    if per_k < low:
+        return max(0.0, per_k / low)
+    if per_k <= high:
+        return 1.0
+    # Above high, linearly decay to 0 at max_ok
+    return max(0.0, (max_ok - per_k) / max(1e-6, (max_ok - high)))
+
+
+# ---- GP Optimizer ----
+@dataclass
+class GPConfig:
+    population: int = 20
+    generations: int = 5
+    max_depth: int = 3
+    max_nodes: int = 12
+    complexity_penalty: float = 0.5  # per node beyond 8
+    cost_bps: float = 1.0
+    min_hold_candles: int = 3
+    cooldown_candles: int = 12
+    elite_frac: float = 0.2
+    elite_count: int = 0
+    # Representation control
+    strategy_type: str = "logic"  # 'logic' or 'nn'
+    # NN-specific configuration
+    nn_arch: List[int] = field(default_factory=lambda: [64, 32])
+    input_norm: str = "rolling"  # 'rolling' or 'affine'
+    nn_mutation_prob: float = 0.3
+    nn_mutation_sigma: float = 0.05
+    nn_affine_sigma: float = 0.02
+    # Optional pluggable scoring function. If provided, this overrides the
+    # built-in composite in fitness(). The callable receives:
+    #  - metrics: Dict[str, float] as produced by metrics_from_positions
+    #  - extras: Dict[str, float] (e.g., {"tf": trade_frequency_score})
+    #  - size: total node count across entry/exit trees
+    #  - depth: max depth across entry/exit trees
+    # and must return a float score (higher is better).
+    score_fn: Optional[Callable[[Dict[str, float], Dict[str, float], int, int], float]] = None
+
+
+def fitness(entry_long: Node, entry_short: Node, exit_long: Optional[Node], exit_short: Optional[Node], X_train: pd.DataFrame, close_col: str, cfg: GPConfig) -> Tuple[float, Dict[str, float], int]:
+    pos = positions_from_tree_three_state(
+        entry_long, entry_short, exit_long, exit_short, X_train,
+        min_hold_candles=cfg.min_hold_candles, cooldown_candles=cfg.cooldown_candles,
+    )
+    m = metrics_from_positions(X_train[close_col], pos, cost_bps=cfg.cost_bps)
+    trades = int(m.get("trades", 0.0))
+
+    # Trade frequency score normalized by sample length (per 1000 bars)
+    tf_score = trade_frequency_score(trades, len(X_train))
+    # Tree complexity stats for optional custom scorer
+    size_total = (
+        node_size(entry_long)
+        + node_size(entry_short)
+        + (node_size(exit_long) if exit_long else 0)
+        + (node_size(exit_short) if exit_short else 0)
+    )
+    depth_total = max(
+        node_depth(entry_long),
+        node_depth(entry_short),
+        (node_depth(exit_long) if exit_long else 0),
+        (node_depth(exit_short) if exit_short else 0),
+    )
+    
+    # Allow an injected scorer to define the fitness directly
+    if cfg.score_fn is not None:
+        try:
+            score_override = cfg.score_fn(m, {"tf": float(tf_score)}, int(size_total), int(depth_total))
+            return float(score_override), m, trades
+        except Exception:
+            # Fall back to the default composite if custom scorer fails
+            pass
+
+    sharpe = float(m.get("sharpe", 0.0))
+    sortino = float(m.get("sortino", 0.0))
+    cumret = float(m.get("cum_return", 0.0))
+    max_dd = float(m.get("max_drawdown", 0.0))
+
+    # Composite ratio with ballast
+    numer = (sharpe + 100.0 if sharpe >= 0.0 else 100.0) *  (sortino + 100.0 if sortino >= 0.0 else 100.0) * ((cumret * 100.0) + 100.0 if cumret >= 0.0 else 100.0) * (100.0 + tf_score * 10)
+    denom = (abs(sharpe) + 100.0 if sharpe < 0.0 else 100.0) * (abs(sortino) + 100.0 if sortino < 0.0 else 100.0) * (abs(cumret * 100.0) + 100.0 if cumret < 0.0 else 100.0) * (100.0 + abs(max_dd) * 500.0)
+    score = numer / max(1e-12, denom)
+    return float(score), m, trades
+
+
+def fitness_nn(genome: NNGenome, X_train: pd.DataFrame, feature_names: List[str], close_col: str, cfg: GPConfig) -> Tuple[float, Dict[str, float], int, int, int]:
+    out = _nn_forward(genome, X_train, feature_names, input_norm=str(cfg.input_norm))
+    pos = positions_from_nn_hysteresis(out)
+    pos.index = X_train.index
+    m = metrics_from_positions(X_train[close_col], pos, cost_bps=cfg.cost_bps)
+    trades = int(m.get("trades", 0.0))
+    tf_score = trade_frequency_score(trades, len(X_train))
+    size_total = _nn_param_count(genome)
+    depth_total = len(genome.arch) + 1  # include output layer
+    # Allow injected scorer if present
+    if cfg.score_fn is not None:
+        try:
+            score_override = cfg.score_fn(m, {"tf": float(tf_score)}, int(size_total), int(depth_total))
+            return float(score_override), m, trades, int(size_total), int(depth_total)
+        except Exception:
+            pass
+    sharpe = float(m.get("sharpe", 0.0))
+    sortino = float(m.get("sortino", 0.0))
+    cumret = float(m.get("cum_return", 0.0))
+    max_dd = float(m.get("max_drawdown", 0.0))
+    numer = (sharpe + 100.0 if sharpe >= 0.0 else 100.0) *  (sortino + 100.0 if sortino >= 0.0 else 100.0) * ((cumret * 100.0) + 100.0 if cumret >= 0.0 else 100.0) * (100.0 + tf_score * 10)
+    denom = (abs(sharpe) + 100.0 if sharpe < 0.0 else 100.0) * (abs(sortino) + 100.0 if sortino < 0.0 else 100.0) * (abs(cumret * 100.0) + 100.0 if cumret < 0.0 else 100.0) * (100.0 + abs(max_dd) * 500.0)
+    score = numer / max(1e-12, denom)
+    return float(score), m, trades, int(size_total), int(depth_total)
+
+
+def run_gp(X: pd.DataFrame, close_col: str, cfg: GPConfig, X_val: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
+    feature_names = [c for c in X.columns if c != close_col and not c.endswith("_close")]
+    # Individuals are tuples of (entry_long, entry_short, exit_long, exit_short)
+    pop: List[Tuple[Node, Node, Optional[Node], Optional[Node]]] = [
+        (
+            random_tree(feature_names, cfg.max_depth),
+            random_tree(feature_names, cfg.max_depth),
+            random_tree(feature_names, cfg.max_depth - 1),
+            random_tree(feature_names, cfg.max_depth - 1),
+        )
+        for _ in range(cfg.population)
+    ]
+    history: List[Dict[str, Any]] = []
+    for gen in range(cfg.generations):
+        scored: List[Tuple[float, Tuple[Node, Node, Optional[Node], Optional[Node]], Dict[str, float], int]] = []
+        for ind in pop:
+            f, m, tr = fitness(ind[0], ind[1], ind[2], ind[3], X, close_col, cfg)
+            scored.append((f, ind, m, tr))
+        scored.sort(key=lambda x: x[0], reverse=True)
+        best_f, best_ind, best_m, best_trades = scored[0]
+        val_m = None
+        if X_val is not None:
+            pos_val = positions_from_tree_three_state(
+                best_ind[0], best_ind[1], best_ind[2], best_ind[3], X_val,
+                min_hold_candles=cfg.min_hold_candles, cooldown_candles=cfg.cooldown_candles,
+            )
+            val_m = metrics_from_positions(X_val[close_col], pos_val, cost_bps=cfg.cost_bps)
+        size = node_size(best_ind[0]) + node_size(best_ind[1]) + (node_size(best_ind[2]) if best_ind[2] else 0) + (node_size(best_ind[3]) if best_ind[3] else 0)
+        depth = max(node_depth(best_ind[0]), node_depth(best_ind[1]), node_depth(best_ind[2]) if best_ind[2] else 0, node_depth(best_ind[3]) if best_ind[3] else 0)
+        history.append({
+            "gen": gen, "fitness": best_f, "metrics": best_m, "val_metrics": val_m, "trades": best_trades,
+            "tree": {
+                "entry_long": pretty(best_ind[0]),
+                "entry_short": pretty(best_ind[1]),
+                "exit_long": pretty(best_ind[2]) if best_ind[2] else None,
+                "exit_short": pretty(best_ind[3]) if best_ind[3] else None,
+            },
+            "size": size, "depth": depth,
+        })
+        print(json.dumps(history[-1]), flush=True)
+
+        # Selection: keep top 20%, fill rest via crossover/mutation
+        elite_n = max(1, int(0.2 * cfg.population))
+        next_pop: List[Tuple[Node, Node, Optional[Node], Optional[Node]]] = [scored[i][1] for i in range(elite_n)]
+        while len(next_pop) < cfg.population:
+            parents = random.sample(scored[:max(10, cfg.population)], 2)
+            a = parents[0][1]
+            b = parents[1][1]
+            # crossover each subtree independently
+            e1, e2 = crossover(a[0], b[0])
+            s1, s2 = crossover(a[1], b[1])
+            xl1, xl2 = crossover(a[2], b[2]) if (a[2] and b[2]) else (a[2] or b[2], None)
+            xs1, xs2 = crossover(a[3], b[3]) if (a[3] and b[3]) else (a[3] or b[3], None)
+            # mutate
+            e1 = mutate(e1, feature_names, cfg.max_depth, 0.3)
+            s1 = mutate(s1, feature_names, cfg.max_depth, 0.3)
+            if xl1 is not None:
+                xl1 = mutate(xl1, feature_names, cfg.max_depth - 1, 0.3)
+            if xs1 is not None:
+                xs1 = mutate(xs1, feature_names, cfg.max_depth - 1, 0.3)
+            next_pop.append((e1, s1, xl1, xs1))
+            if len(next_pop) < cfg.population:
+                e2 = mutate(e2, feature_names, cfg.max_depth, 0.3)
+                s2 = mutate(s2, feature_names, cfg.max_depth, 0.3)
+                if xl2 is not None:
+                    xl2 = mutate(xl2, feature_names, cfg.max_depth - 1, 0.3)
+                if xs2 is not None:
+                    xs2 = mutate(xs2, feature_names, cfg.max_depth - 1, 0.3)
+                next_pop.append((e2, s2, xl2, xs2))
+        pop = next_pop
+
+    # Final best
+    scored_final: List[Tuple[float, Tuple[Node, Node, Optional[Node], Optional[Node]], Dict[str, float], int]] = []
+    for ind in pop:
+        f, m, tr = fitness(ind[0], ind[1], ind[2], ind[3], X, close_col, cfg)
+        scored_final.append((f, ind, m, tr))
+    scored_final.sort(key=lambda x: x[0], reverse=True)
+    bf, bt, bm, tr = scored_final[0]
+    # Sanity: compute additional stats for best individual
+    pos_train = positions_from_tree_three_state(bt[0], bt[1], bt[2], bt[3], X, cfg.min_hold_candles, cfg.cooldown_candles)
+    avg_hold = float((pos_train.ne(pos_train.shift(1))).cumsum().diff().groupby((pos_train != pos_train.shift()).cumsum()).transform('size').dropna().mean() or 0.0) if len(pos_train) > 0 else 0.0
+    return {
+        "best_fitness": bf,
+        "best_tree": {
+            "entry_long": pretty(bt[0]),
+            "entry_short": pretty(bt[1]),
+            "exit_long": pretty(bt[2]) if bt[2] else None,
+            "exit_short": pretty(bt[3]) if bt[3] else None,
+        },
+        "best_metrics": bm,
+        "best_trades": tr,
+        "avg_hold_bars_train": avg_hold,
+        "history": history,
+    }
+
+
+def parse_cli() -> argparse.Namespace:
+    p = argparse.ArgumentParser(description="GP-style logic optimization across multiple instruments")
+    p.add_argument("--data-dir", default=os.path.join(os.path.dirname(__file__), "data"))
+    p.add_argument("--train-start", default="2020-01-01")
+    p.add_argument("--train-end", default="2022-12-31")
+    p.add_argument("--val-start", default="2023-01-01")
+    p.add_argument("--val-end", default="2023-12-31")
+    p.add_argument("--population", type=int, default=8)
+    p.add_argument("--generations", type=int, default=3)
+    p.add_argument("--max-depth", type=int, default=3)
+    p.add_argument("--max-nodes", type=int, default=12)
+    p.add_argument("--complexity-penalty", type=float, default=0.5)
+    p.add_argument("--cost-bps", type=float, default=1.0)
+    p.add_argument("--min-hold", type=int, default=3, help="Minimum bars to hold a position (e.g., 3 for 15 minutes)")
+    p.add_argument("--cooldown", type=int, default=12, help="Cooldown bars after exit before new entry (e.g., 12 for 1 hour)")
+    p.add_argument("--subsample", type=int, default=40, help="Use every k-th bar for speed (1=no downsample)")
+    p.add_argument("--seed", type=int, default=123)
+    p.add_argument("--checkpoint-dir", default=os.path.join(os.path.dirname(__file__), "runs", "gp"))
+    p.add_argument("--top-k", type=int, default=3, help="Save top-K individuals per generation")
+    p.add_argument("--final-top-k", type=int, default=5, help="Evaluate top-K elites on validation at end")
+    # Strategy representation
+    p.add_argument("--strategy-type", default="logic", choices=["logic", "nn"], help="Strategy representation: logic trees or neural-net genome")
+    p.add_argument("--nn-arch", default="64,32", help="Hidden layer sizes for NN, comma-separated (e.g., 256,128,64)")
+    p.add_argument("--input-norm", default="rolling", choices=["rolling", "affine"], help="Input normalization: reuse rolling z-scores or learned affine")
+    p.add_argument("--nn-mutation-prob", type=float, default=0.3)
+    p.add_argument("--nn-mutation-sigma", type=float, default=0.05)
+    p.add_argument("--nn-affine-sigma", type=float, default=0.02)
+    # Conservative defaults for small hosts
+    p.add_argument("--train-max-rows", type=int, default=20000, help="Limit training rows (tail)")
+    p.add_argument("--val-max-rows", type=int, default=8000, help="Limit validation rows (tail)")
+    # Config profiles
+    p.add_argument("--profile", default="", help="Named arg set: small|medium|large or custom id (optional)")
+    p.add_argument("--list-profiles", action="store_true", help="List available profiles and exit")
+    p.add_argument("--save-profile", help="Save current args to profiles.json under this id")
+    # Elitism controls
+    p.add_argument("--elite-frac", type=float, default=0.2, help="Fraction of parents carried over (ignored if elite-count>0)")
+    p.add_argument("--elite-count", type=int, default=0, help="Exact number of parents carried over; overrides elite-frac if >0")
+    return p.parse_args()
+
+
+def main() -> None:
+    a = parse_cli()
+    # Apply profiles
+    profiles_path = os.path.join(os.path.dirname(__file__), "profiles.json")
+    # Predefined profiles
+    default_profiles = {
+        "small": {"population": 8, "generations": 3, "subsample": 40, "train_max_rows": 20000, "val_max_rows": 8000, "elite_frac": 0.2},
+        "medium": {"population": 50, "generations": 15, "subsample": 20, "train_max_rows": 80000, "val_max_rows": 30000, "elite_frac": 0.2},
+        "large": {"population": 120, "generations": 30, "subsample": 10, "train_max_rows": 160000, "val_max_rows": 60000, "elite_frac": 0.2},
+    }
+    # Load user profiles if any
+    user_profiles = {}
+    if os.path.exists(profiles_path):
+        try:
+            with open(profiles_path, "r", encoding="utf-8") as f:
+                user_profiles = json.load(f)
+        except Exception:
+            user_profiles = {}
+    all_profiles = {**default_profiles, **user_profiles}
+    if a.list_profiles:
+        print(json.dumps({"event": "profiles", "profiles": all_profiles}, indent=2))
+        return
+    if a.profile and a.profile in all_profiles:
+        prof = all_profiles[a.profile]
+        for k, v in prof.items():
+            setattr(a, k, v)
+    # Optionally save current args as new profile
+    if a.save_profile:
+        user_profiles[a.save_profile] = {
+            "population": int(a.population),
+            "generations": int(a.generations),
+            "subsample": int(a.subsample),
+            "train_max_rows": int(a.train_max_rows),
+            "val_max_rows": int(a.val_max_rows),
+            "elite_frac": float(a.elite_frac),
+            "elite_count": int(a.elite_count),
+        }
+        with open(profiles_path, "w", encoding="utf-8") as f:
+            json.dump({**user_profiles}, f, indent=2)
+        print(json.dumps({"event": "profile_saved", "id": a.save_profile}), flush=True)
+    random.seed(int(a.seed))
+    np.random.seed(int(a.seed))
+    start_ts = time.time()
+    # Compute build-time limits (can be disabled via flags or <=0 values)
+    build_max_rows: Optional[int]
+    if hasattr(a, "no_max_rows") and a.no_max_rows:
+        build_max_rows = None
+    else:
+        tm = int(a.train_max_rows) if a.train_max_rows is not None else 0
+        vm = int(a.val_max_rows) if a.val_max_rows is not None else 0
+        if tm <= 0 and vm <= 0:
+            build_max_rows = None
+        else:
+            tm = max(0, tm)
+            vm = max(0, vm)
+            build_max_rows = (tm + vm) if (tm + vm) > 0 else None
+
+    feats = build_features(
+        a.data_dir,
+        start=a.train_start,
+        end=a.val_end,
+        subsample=int(a.subsample) if a.subsample else 1,
+        max_rows=build_max_rows,
+    )
+    X_all = feats["X"]
+    print(json.dumps({
+        "event": "features_loaded",
+        "loaded_instruments": feats.get("loaded"),
+        "missing_instruments": feats.get("missing"),
+        "n_features": int(X_all.shape[1]),
+    }), flush=True)
+    # Choose primary close for PnL computation: EUR_USD close
+    close_col = "EUR_USD_close"
+    # Split
+    X_train = X_all[(X_all.index >= pd.to_datetime(a.train_start, utc=True)) & (X_all.index <= pd.to_datetime(a.train_end, utc=True))]
+    X_val = X_all[(X_all.index >= pd.to_datetime(a.val_start, utc=True)) & (X_all.index <= pd.to_datetime(a.val_end, utc=True))]
+
+    # Downsample and limit rows to reduce memory/CPU (post split)
+    if int(a.subsample) > 1:
+        step = int(a.subsample)
+        X_train = X_train.iloc[::step]
+        X_val = X_val.iloc[::step] if len(X_val) > 0 else X_val
+    if not (hasattr(a, "no_max_rows") and a.no_max_rows):
+        if a.train_max_rows is not None and int(a.train_max_rows) > 0 and len(X_train) > int(a.train_max_rows):
+            X_train = X_train.tail(int(a.train_max_rows))
+        if a.val_max_rows is not None and int(a.val_max_rows) > 0 and len(X_val) > int(a.val_max_rows):
+            X_val = X_val.tail(int(a.val_max_rows))
+
+    run_dir = os.path.join(str(a.checkpoint_dir), time.strftime("%Y%m%d-%H%M%S"))
+    os.makedirs(run_dir, exist_ok=True)
+    with open(os.path.join(run_dir, "run_meta.json"), "w", encoding="utf-8") as f:
+        json.dump({
+            "args": vars(a),
+            "close_col": close_col,
+            "train_rows": int(len(X_train)),
+            "val_rows": int(len(X_val)),
+            "num_features": int(X_train.shape[1]),
+            "start_time": start_ts,
+        }, f)
+    print(json.dumps({
+        "event": "start", "run_dir": run_dir,
+        "train_rows": int(len(X_train)), "val_rows": int(len(X_val)), "features": int(X_train.shape[1]),
+        "subsample": int(a.subsample), "build_max_rows": (build_max_rows if build_max_rows is not None else "none"),
+    }), flush=True)
+
+    cfg = GPConfig(
+        population=int(a.population),
+        generations=int(a.generations),
+        max_depth=int(a.max_depth),
+        max_nodes=int(a.max_nodes),
+        complexity_penalty=float(a.complexity_penalty),
+        cost_bps=float(a.cost_bps),
+        min_hold_candles=(0 if str(a.strategy_type) == "nn" else int(a.min_hold)),
+        cooldown_candles=(0 if str(a.strategy_type) == "nn" else int(a.cooldown)),
+        elite_frac=float(a.elite_frac),
+        elite_count=int(a.elite_count),
+        strategy_type=str(a.strategy_type),
+        nn_arch=[int(x) for x in str(a.nn_arch).split(',') if str(x).strip()],
+        input_norm=str(a.input_norm),
+        nn_mutation_prob=float(a.nn_mutation_prob),
+        nn_mutation_sigma=float(a.nn_mutation_sigma),
+        nn_affine_sigma=float(a.nn_affine_sigma),
+    )
+    # Wrap run to stream checkpoints
+    def save_generation(gen: int, scored: List[Tuple[float, Tuple[Node, Node, Optional[Node], Optional[Node]], Dict[str, float], int]]) -> None:
+        top_k = max(1, int(a.top_k))
+        path = os.path.join(run_dir, f"gen_{gen:03d}.jsonl")
+        with open(path, "w", encoding="utf-8") as f:
+            for i in range(min(top_k, len(scored))):
+                fit, ind, m, tr = scored[i]
+                record = {
+                    "rank": i + 1,
+                    "fitness": float(fit),
+                    "metrics": m,
+                    "trades": int(tr),
+                    "size": node_size(ind[0]) + node_size(ind[1]) + (node_size(ind[2]) if ind[2] else 0) + (node_size(ind[3]) if ind[3] else 0),
+                    "depth": max(node_depth(ind[0]), node_depth(ind[1]), node_depth(ind[2]) if ind[2] else 0, node_depth(ind[3]) if ind[3] else 0),
+                    "entry_long": node_to_dict(ind[0]),
+                    "entry_short": node_to_dict(ind[1]),
+                    "exit_long": node_to_dict(ind[2]),
+                    "exit_short": node_to_dict(ind[3]),
+                }
+                f.write(json.dumps(record) + "\n")
+
+    # Monkey-patch run_gp loop to save checkpoints per generation
+    # We re-implement a slim runner here to keep code simple
+    feature_names = [c for c in X_train.columns if c != close_col and not c.endswith("_close")]
+    is_nn = (str(a.strategy_type) == "nn")
+    if not is_nn:
+        pop: List[Tuple[Node, Node, Optional[Node], Optional[Node]]] = [
+            (
+                random_tree(feature_names, cfg.max_depth),
+                random_tree(feature_names, cfg.max_depth),
+                random_tree(feature_names, cfg.max_depth - 1),
+                random_tree(feature_names, cfg.max_depth - 1),
+            ) for _ in range(cfg.population)
+        ]
+    else:
+        # Initialize NN population
+        try:
+            nn_arch = [int(x) for x in str(a.nn_arch).split(',') if str(x).strip()]
+        except Exception:
+            nn_arch = [64, 32]
+        pop_nn: List[NNGenome] = [_nn_init(len(feature_names), nn_arch, use_affine=(str(a.input_norm) == "affine")) for _ in range(cfg.population)]
+
+    history: List[Dict[str, Any]] = []
+    ever_best_f: Optional[float] = None
+    for gen in range(cfg.generations):
+        t0 = time.time()
+        if not is_nn:
+            scored: List[Tuple[float, Tuple[Node, Node, Optional[Node], Optional[Node]], Dict[str, float], int]] = []
+            for ind in pop:  # type: ignore[name-defined]
+                fval, met, tr = fitness(ind[0], ind[1], ind[2], ind[3], X_train, close_col, cfg)
+                scored.append((fval, ind, met, tr))
+            scored.sort(key=lambda x: x[0], reverse=True)
+            save_generation(gen, scored)
+            # logging summary
+            best_f, best_ind, best_m, best_tr = scored[0]
+            median_f = float(np.median([s[0] for s in scored])) if scored else float("nan")
+            best_tf = trade_frequency_score(int(best_tr), len(X_train))
+            evt = {
+            "event": "gen_summary",
+            "gen": int(gen),
+            "med": round(float(median_f), 4) if np.isfinite(median_f) else median_f,
+            "sec": round(time.time() - t0, 3),
+            "tree": int(
+                node_size(best_ind[0])
+                + node_size(best_ind[1])
+                + (node_size(best_ind[2]) if best_ind[2] else 0)
+                + (node_size(best_ind[3]) if best_ind[3] else 0)
+            ),
+            "best": {
+                "fit": round(float(best_f), 4),
+                "trd": int(best_tr),
+                "shrp": round(float(best_m.get("sharpe", 0.0)), 4),
+                "srtn": round(float(best_m.get("sortino", 0.0)), 4),
+                "cum": round(float(best_m.get("cum_return", 0.0)), 4),
+                "dd": round(float(best_m.get("max_drawdown", 0.0)), 4),
+                "tf": round(float(best_tf), 4),
+            },
+        }
+            print(json.dumps(evt), flush=True)
+
+            # evolve
+            elite_n = int(cfg.elite_count) if int(cfg.elite_count) > 0 else max(1, int(cfg.elite_frac * cfg.population))
+            elite_n = min(max(1, elite_n), cfg.population - 1 if cfg.population > 1 else 1)
+            next_pop: List[Tuple[Node, Node, Optional[Node], Optional[Node]]] = []
+            seen: set[str] = set()
+            for i in range(elite_n):
+                raw = scored[i][1]
+                elite = (
+                    simplify_const(clone_node(raw[0])),
+                    simplify_const(clone_node(raw[1])),
+                    simplify_const(clone_node(raw[2])) if raw[2] else None,
+                    simplify_const(clone_node(raw[3])) if raw[3] else None,
+                )
+                key = individual_key(elite)
+                if key not in seen:
+                    next_pop.append(elite)  # type: ignore[arg-type]
+                    seen.add(key)
+            while len(next_pop) < cfg.population:
+                parents = random.sample(scored[:max(10, cfg.population)], 2)
+                a_ind = parents[0][1]; b_ind = parents[1][1]
+                pa = clone_individual(a_ind)
+                pb = clone_individual(b_ind)
+                e1, e2 = crossover(pa[0], pb[0])
+                s1, s2 = crossover(pa[1], pb[1])
+                xl1, xl2 = crossover(pa[2], pb[2]) if (pa[2] and pb[2]) else (pa[2] or pb[2], None)
+                xs1, xs2 = crossover(pa[3], pb[3]) if (pa[3] and pb[3]) else (pa[3] or pb[3], None)
+                e1 = mutate(e1, feature_names, cfg.max_depth, 0.3)
+                s1 = mutate(s1, feature_names, cfg.max_depth, 0.3)
+                if xl1 is not None:
+                    xl1 = mutate(xl1, feature_names, cfg.max_depth - 1, 0.3)
+                if xs1 is not None:
+                    xs1 = mutate(xs1, feature_names, cfg.max_depth - 1, 0.3)
+                child1 = (simplify_const(e1), simplify_const(s1), simplify_const(xl1) if xl1 else None, simplify_const(xs1) if xs1 else None)
+                k1 = individual_key(child1)
+                if k1 not in seen:
+                    next_pop.append(child1)  # type: ignore[arg-type]
+                    seen.add(k1)
+                if len(next_pop) < cfg.population:
+                    e2m = mutate(e2, feature_names, cfg.max_depth, 0.3)
+                    s2m = mutate(s2, feature_names, cfg.max_depth, 0.3)
+                    if xl2 is not None:
+                        xl2 = mutate(xl2, feature_names, cfg.max_depth - 1, 0.3)
+                    if xs2 is not None:
+                        xs2 = mutate(xs2, feature_names, cfg.max_depth - 1, 0.3)
+                    child2 = (simplify_const(e2m), simplify_const(s2m), simplify_const(xl2) if xl2 else None, simplify_const(xs2) if xs2 else None)
+                    k2 = individual_key(child2)
+                    if k2 not in seen:
+                        next_pop.append(child2)  # type: ignore[arg-type]
+                        seen.add(k2)
+            pop = next_pop
+        else:
+            scored_nn: List[Tuple[float, NNGenome, Dict[str, float], int, int, int]] = []
+            # (score, genome, metrics, trades, size, depth)
+            for g in pop_nn:  # type: ignore[name-defined]
+                fval, met, tr, sz, dp = fitness_nn(g, X_train, feature_names, close_col, cfg)
+                scored_nn.append((fval, g, met, tr, sz, dp))
+            scored_nn.sort(key=lambda x: x[0], reverse=True)
+            # Save generation (NN): write compact records
+            top_k = max(1, int(a.top_k))
+            path = os.path.join(run_dir, f"gen_{gen:03d}.jsonl")
+            with open(path, "w", encoding="utf-8") as f:
+                for i in range(min(top_k, len(scored_nn))):
+                    fit, g, m, tr, sz, dp = scored_nn[i]
+                    record = {
+                        "rank": i + 1,
+                        "fitness": float(fit),
+                        "metrics": m,
+                        "trades": int(tr),
+                        "size": int(sz),
+                        "depth": int(dp),
+                        "nn_arch": list(g.arch),
+                    }
+                    f.write(json.dumps(record) + "\n")
+            # Logging summary
+            best_f, best_g, best_m, best_tr, best_sz, best_dp = scored_nn[0]
+            median_f = float(np.median([s[0] for s in scored_nn])) if scored_nn else float("nan")
+            best_tf = trade_frequency_score(int(best_tr), len(X_train))
+            evt = {
+                "event": "gen_summary",
+                "gen": int(gen),
+                "med": round(float(median_f), 4) if np.isfinite(median_f) else median_f,
+                "sec": round(time.time() - t0, 3),
+                "tree": int(best_sz),  # reuse field name for size
+                "best": {
+                    "fit": round(float(best_f), 4),
+                    "trd": int(best_tr),
+                    "shrp": round(float(best_m.get("sharpe", 0.0)), 4),
+                    "srtn": round(float(best_m.get("sortino", 0.0)), 4),
+                    "cum": round(float(best_m.get("cum_return", 0.0)), 4),
+                    "dd": round(float(best_m.get("max_drawdown", 0.0)), 4),
+                    "tf": round(float(best_tf), 4),
+                },
+            }
+            print(json.dumps(evt), flush=True)
+            # Evolve NN population
+            elite_n = int(cfg.elite_count) if int(cfg.elite_count) > 0 else max(1, int(cfg.elite_frac * cfg.population))
+            elite_n = min(max(1, elite_n), cfg.population - 1 if cfg.population > 1 else 1)
+            next_pop_nn: List[NNGenome] = []
+            # Elites (deep copy)
+            for i in range(elite_n):
+                next_pop_nn.append(_nn_clone(scored_nn[i][1]))
+            # Fill remainder
+            while len(next_pop_nn) < cfg.population:
+                parents = random.sample(scored_nn[:max(10, cfg.population)], 2)
+                pa = parents[0][1]; pb = parents[1][1]
+                c1, c2 = _nn_crossover(pa, pb)
+                c1 = _nn_mutate(c1, p_mut=float(cfg.nn_mutation_prob), w_sigma=float(cfg.nn_mutation_sigma), aff_sigma=float(cfg.nn_affine_sigma))
+                next_pop_nn.append(c1)
+                if len(next_pop_nn) < cfg.population:
+                    c2 = _nn_mutate(c2, p_mut=float(cfg.nn_mutation_prob), w_sigma=float(cfg.nn_mutation_sigma), aff_sigma=float(cfg.nn_affine_sigma))
+                    next_pop_nn.append(c2)
+            pop_nn = next_pop_nn
+
+    # final evaluation of last population
+    if not is_nn:
+        final_scores: List[Tuple[float, Tuple[Node, Node, Optional[Node], Optional[Node]], Dict[str, float], int]] = []
+        for ind in pop:  # type: ignore[name-defined]
+            fval, met, tr = fitness(ind[0], ind[1], ind[2], ind[3], X_train, close_col, cfg)
+            final_scores.append((fval, ind, met, tr))
+        final_scores.sort(key=lambda x: x[0], reverse=True)
+        bf, bt, bm, tr = final_scores[0]
+        # Save final
+        with open(os.path.join(run_dir, "final.json"), "w", encoding="utf-8") as f:
+            json.dump({
+                "fitness": float(bf), "metrics": bm, "trades": int(tr),
+                "tree": {
+                    "entry_long": node_to_dict(bt[0]),
+                    "entry_short": node_to_dict(bt[1]),
+                    "exit_long": node_to_dict(bt[2]),
+                    "exit_short": node_to_dict(bt[3]),
+                }
+            }, f)
+        print(json.dumps({"event": "result", "best": {"fitness": float(bf), "tree": {
+            "entry_long": pretty(bt[0]), "entry_short": pretty(bt[1]),
+            "exit_long": pretty(bt[2]) if bt[2] else None, "exit_short": pretty(bt[3]) if bt[3] else None,
+        }, "metrics": bm, "trades": int(tr), "run_dir": run_dir}}), flush=True)
+    else:
+        final_scores_nn: List[Tuple[float, NNGenome, Dict[str, float], int, int, int]] = []
+        for g in pop_nn:  # type: ignore[name-defined]
+            fval, met, tr, sz, dp = fitness_nn(g, X_train, feature_names, close_col, cfg)
+            final_scores_nn.append((fval, g, met, tr, sz, dp))
+        final_scores_nn.sort(key=lambda x: x[0], reverse=True)
+        bf, bg, bm, tr, bsz, bdp = final_scores_nn[0]
+        with open(os.path.join(run_dir, "final.json"), "w", encoding="utf-8") as f:
+            json.dump({
+                "fitness": float(bf), "metrics": bm, "trades": int(tr),
+                "nn": {
+                    "arch": list(bg.arch),
+                    "params": int(bsz),
+                    "genome": _nn_to_dict(bg),
+                }
+            }, f)
+        print(json.dumps({"event": "result", "best": {"fitness": float(bf), "nn": {
+            "summary": _nn_pretty(bg, len(feature_names))
+        }, "metrics": bm, "trades": int(tr), "run_dir": run_dir}}), flush=True)
+
+    # Evaluate top-K elites on validation (if available)
+    if X_val is not None and len(X_val) > 0:
+        path = os.path.join(run_dir, "final_elites.jsonl")
+        with open(path, "w", encoding="utf-8") as f:
+            if not is_nn:
+                k = max(1, int(a.final_top_k))
+                # type: ignore[name-defined]
+                k = min(k, len(final_scores))  # type: ignore[arg-type]
+                for rank in range(k):
+                    fit, ind, train_m, train_tr = final_scores[rank]  # type: ignore[index]
+                    pos_val = positions_from_tree_three_state(ind[0], ind[1], ind[2], ind[3], X_val, cfg.min_hold_candles, cfg.cooldown_candles)
+                    val_m = metrics_from_positions(X_val[close_col], pos_val, cost_bps=cfg.cost_bps)
+                    rec = {
+                        "rank": rank + 1,
+                        "fitness_train": float(fit),
+                        "metrics_train": train_m,
+                        "metrics_val": val_m,
+                        "trades_train": int(train_tr),
+                        "trades_val": int(val_m.get("trades", 0.0)),
+                        "tree": {
+                            "entry_long": pretty(ind[0]),
+                            "entry_short": pretty(ind[1]),
+                            "exit_long": pretty(ind[2]) if ind[2] else None,
+                            "exit_short": pretty(ind[3]) if ind[3] else None,
+                        },
+                    }
+                    f.write(json.dumps(rec) + "\n")
+            else:
+                k = max(1, int(a.final_top_k))
+                k = min(k, len(final_scores_nn))  # type: ignore[name-defined]
+                for rank in range(k):
+                    fit, g, train_m, train_tr, sz, dp = final_scores_nn[rank]  # type: ignore[index]
+                    out_val = _nn_forward(g, X_val, feature_names, input_norm=str(a.input_norm))
+                    pos_val = positions_from_nn_hysteresis(out_val)
+                    val_m = metrics_from_positions(X_val[close_col], pos_val, cost_bps=cfg.cost_bps)
+                    rec = {
+                        "rank": rank + 1,
+                        "fitness_train": float(fit),
+                        "metrics_train": train_m,
+                        "metrics_val": val_m,
+                        "trades_train": int(train_tr),
+                        "trades_val": int(val_m.get("trades", 0.0)),
+                        "nn": {
+                            "arch": list(g.arch),
+                            "params": int(sz),
+                            "summary": _nn_pretty(g, len(feature_names)),
+                        },
+                    }
+                    f.write(json.dumps(rec) + "\n")
+        print(json.dumps({"event": "final_elites", "count": (k if 'k' in locals() else 0), "file": path}), flush=True)
+
+
+if __name__ == "__main__":
+    main()

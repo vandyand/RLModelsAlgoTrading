@@ -1,0 +1,55 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+.conda/
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+
+# Logs & runtime output
+logs/
+*.log
+nohup.out
+
+# Checkpoints & model weights
+checkpoints/
+**/checkpoints/
+*.pt
+*.pth
+*.ckpt
+
+# Local databases & caches
+*.sqlite*
+*.db
+*.db-*
+*.lock
+
+# Data dumps & large artifacts
+*.csv
+*.npz
+*.npy
+*.parquet
+*.feather
+
+# Backup / temporary files
+*.bak
+*.tmp
+*.old
+*.orig
+
+# Node / PHP vendor (for ref demos, if re-installed)
+node_modules/
+vendor/
+
+# OS files
+.DS_Store
+Thumbs.db
+windows.jsonl

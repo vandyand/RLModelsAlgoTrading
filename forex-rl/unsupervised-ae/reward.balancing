@@ -1,0 +1,179 @@
+# Preferred Reward Normalization Strategy: Summary Reference
+
+## Core Approach: Running Statistics + Simple Equal Weighting
+
+**Philosophy**: Normalize both loss components to similar scales using running statistics, then use simple equal weighting. This eliminates 90% of gradient balancing problems with minimal complexity.
+
+## Implementation
+
+### **1. Running Normalizer Class**
+```python
+import torch
+import torch.nn as nn
+
+class RunningNormalizer:
+    def __init__(self, momentum=0.99):
+        self.momentum = momentum
+        self.running_mean = 0
+        self.running_var = 1
+        self.initialized = False
+    
+    def normalize(self, value):
+        """Normalize single values or tensors to approximately [-1, 1]"""
+        if not self.initialized:
+            self.running_mean = value.mean().item() if torch.is_tensor(value) else value
+            self.running_var = value.var().item() if torch.is_tensor(value) else 1.0
+            self.initialized = True
+        else:
+            # Update running statistics
+            current_mean = value.mean().item() if torch.is_tensor(value) else value
+            current_var = value.var().item() if torch.is_tensor(value) else 1.0
+            
+            self.running_mean = self.momentum * self.running_mean + (1 - self.momentum) * current_mean
+            self.running_var = self.momentum * self.running_var + (1 - self.momentum) * current_var
+        
+        # Normalize and clip to [-1, 1]
+        normalized = (value - self.running_mean) / (torch.sqrt(torch.tensor(self.running_var)) + 1e-8)
+        return torch.tanh(normalized)
+```
+
+### **2. Complete Trading Autoencoder with Normalization**
+```python
+class NormalizedTradingAutoencoder(nn.Module):
+    def __init__(self, input_dim=100, bottleneck_dim=12, num_instruments=20):
+        super().__init__()
+        
+        # Network architecture
+        self.encoder = nn.Sequential(
+            nn.Linear(input_dim, 64),
+            nn.ReLU(),
+            nn.Linear(64, 32),
+            nn.ReLU(),
+            nn.Linear(32, bottleneck_dim)
+        )
+        
+        self.decoder = nn.Sequential(
+            nn.Linear(bottleneck_dim, 32),
+            nn.ReLU(),
+            nn.Linear(32, 64),
+            nn.ReLU(),
+            nn.Linear(64, input_dim)
+        )
+        
+        self.position_head = nn.Sequential(
+            nn.Linear(bottleneck_dim, 16),
+            nn.ReLU(),
+            nn.Linear(16, num_instruments),
+            nn.Tanh()  # Positions in [-1, 1]
+        )
+        
+        # Normalizers for loss components
+        self.recon_normalizer = RunningNormalizer(momentum=0.99)
+        self.reward_normalizer = RunningNormalizer(momentum=0.99)
+    
+    def forward(self, features):
+        bottleneck = self.encoder(features)
+        reconstruction = self.decoder(bottleneck)
+        positions = self.position_head(bottleneck)
+        return reconstruction, positions
+    
+    def compute_normalized_loss(self, features, returns, recon_weight=0.5, reward_weight=0.5):
+        """Compute loss with automatic normalization"""
+        reconstruction, positions = self.forward(features)
+        
+        # Raw loss components
+        recon_loss = F.mse_loss(reconstruction, features)
+        
+        # Portfolio returns and composite reward
+        portfolio_returns = torch.sum(positions * returns, dim=1)
+        reward = self.composite_reward_function(portfolio_returns)
+        reward_loss = -reward.mean()  # Negative because we want to maximize reward
+        
+        # Normalize both components to similar scales
+        norm_recon_loss = self.recon_normalizer.normalize(recon_loss)
+        norm_reward_loss = self.reward_normalizer.normalize(reward_loss)
+        
+        # Simple weighted combination
+        total_loss = recon_weight * norm_recon_loss + reward_weight * norm_reward_loss
+        
+        return total_loss, {
+            'raw_recon_loss': recon_loss.item(),
+            'raw_reward_loss': reward_loss.item(),
+            'norm_recon_loss': norm_recon_loss.item(),
+            'norm_reward_loss': norm_reward_loss.item(),
+            'total_loss': total_loss.item()
+        }
+    
+    def composite_reward_function(self, portfolio_returns):
+        """Your composite reward function"""
+        # Example implementation
+        mean_return = portfolio_returns.mean()
+        downside_returns = torch.clamp(portfolio_returns, max=0)
+        downside_risk = torch.sqrt(torch.mean(downside_returns**2))
+        
+        # Composite reward (return/risk ratio)
+        reward = mean_return / (downside_risk + 1e-8)
+        return reward
+```
+
+### **3. Training Loop with Monitoring**
+```python
+def train_normalized_model(model, dataloader, optimizer, num_epochs=100):
+    model.train()
+    
+    for epoch in range(num_epochs):
+        epoch_metrics = []
+        
+        for batch_features, batch_returns in dataloader:
+            optimizer.zero_grad()
+            
+            # Compute normalized loss
+            total_loss, metrics = model.compute_normalized_loss(
+                batch_features, 
+                batch_returns,
+                recon_weight=0.5,  # Equal weighting
+                reward_weight=0.5
+            )
+            
+            total_loss.backward()
+            optimizer.step()
+            
+            epoch_metrics.append(metrics)
+        
+        # Log progress every 10 epochs
+        if epoch % 10 == 0:
+            avg_metrics = {k: np.mean([m[k] for m in epoch_metrics]) 
+                          for k in epoch_metrics[0].keys()}
+            
+            print(f"Epoch {epoch}:")
+            print(f"  Raw Recon Loss: {avg_metrics['raw_recon_loss']:.4f}")
+            print(f"  Raw Reward Loss: {avg_metrics['raw_reward_loss']:.4f}")
+            print(f"  Norm Recon Loss: {avg_metrics['norm_recon_loss']:.4f}")
+            print(f"  Norm Reward Loss: {avg_metrics['norm_reward_loss']:.4f}")
+            print(f"  Total Loss: {avg_metrics['total_loss']:.4f}")
+            print(f"  Loss Ratio: {abs(avg_metrics['norm_recon_loss'] / avg_metrics['norm_reward_loss']):.2f}")
+```
+
+## Key Benefits
+
+**✅ Automatic Scaling**: Running statistics adapt to changing loss magnitudes  
+**✅ Simple Implementation**: No complex gradient monitoring or adaptive weighting  
+**✅ Robust**: Tanh clipping prevents extreme values from destabilizing training  
+**✅ Interpretable**: Easy to understand and debug  
+**✅ Balanced Learning**: Both objectives get roughly equal gradient influence
+
+## Usage Guidelines
+
+**Momentum Parameter**: 
+- `0.99` for stable, slow adaptation
+- `0.95` for faster adaptation to regime changes
+- `0.999` for very gradual adaptation
+
+**Weight Ratios**:
+- Start with `(0.5, 0.5)` equal weighting
+- Adjust to `(0.3, 0.7)` if you want to prioritize trading performance
+- Monitor that normalized losses stay within 2-5x of each other
+
+**Monitoring**: Always log both raw and normalized losses to ensure the normalization is working correctly.
+
+This approach eliminates the need for complex gradient balancing techniques while ensuring both loss components contribute meaningfully to training.

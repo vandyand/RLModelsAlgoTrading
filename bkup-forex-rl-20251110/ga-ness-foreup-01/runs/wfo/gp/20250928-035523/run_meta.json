@@ -1,0 +1,24 @@
+{
+  "args": {
+    "data_dir": "/root/rl-trader/forex-rl/ga-ness/data",
+    "start": "2020-01-01",
+    "end": "2024-12-31",
+    "train_months": 1,
+    "val_months": 1,
+    "step_months": 1,
+    "population": 50,
+    "generations": 20,
+    "max_depth": 3,
+    "cost_bps": 0.1,
+    "min_hold": 3,
+    "cooldown": 12,
+    "subsample": 1,
+    "seed": 123,
+    "windows_limit": 0,
+    "checkpoint_dir": "/root/rl-trader/forex-rl/ga-ness/runs/wfo/gp",
+    "no_gen_logs": false,
+    "per_window_build": true,
+    "warmup_days": 10
+  },
+  "windows": 58
+}

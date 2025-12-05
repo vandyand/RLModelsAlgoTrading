@@ -1,0 +1,129 @@
+live starting with instruments=['EUR_USD', 'USD_JPY', 'GBP_USD', 'AUD_USD', 'USD_CHF', 'USD_CAD', 'NZD_USD', 'EUR_JPY', 'GBP_JPY', 'EUR_GBP', 'EUR_CHF', 'EUR_AUD', 'EUR_CAD', 'GBP_CHF', 'AUD_JPY', 'AUD_CHF', 'CAD_JPY', 'NZD_JPY', 'GBP_AUD', 'AUD_NZD'] mode=absolute band=(0.05,0.02) abs=(0.8,0.6,0.2,0.4)
+[heartbeat] 2025-10-21T00:45:36.049643+00:00 waiting 279.0s for next M5+grace
+[heartbeat] 2025-10-21T00:46:36.064437+00:00 waiting 218.9s for next M5+grace
+[heartbeat] 2025-10-21T00:47:36.080279+00:00 waiting 158.9s for next M5+grace
+[heartbeat] 2025-10-21T00:48:36.097057+00:00 waiting 98.9s for next M5+grace
+[heartbeat] 2025-10-21T00:49:36.113803+00:00 waiting 38.9s for next M5+grace
+2025-10-21T00:50:38.053333+00:00 close=2025-10-21 00:45:00+00:00 decisions:
+  EUR_USD: prev_units=+0 prev_state=+0 out=1.0000 -> state=+1 target=+100 delta=+100
+  USD_JPY: prev_units=+0 prev_state=+0 out=0.0027 -> state=-1 target=-100 delta=-100
+  GBP_USD: prev_units=+0 prev_state=+0 out=0.3280 -> state=+0 target=+0 delta=+0
+  AUD_USD: prev_units=+0 prev_state=+0 out=0.8733 -> state=+1 target=+100 delta=+100
+  USD_CHF: prev_units=+0 prev_state=+0 out=0.0000 -> state=-1 target=-100 delta=-100
+  USD_CAD: prev_units=+0 prev_state=+0 out=0.0009 -> state=-1 target=-100 delta=-100
+  NZD_USD: prev_units=+0 prev_state=+0 out=0.0000 -> state=-1 target=-100 delta=-100
+  EUR_JPY: prev_units=+0 prev_state=+0 out=0.9978 -> state=+1 target=+100 delta=+100
+  GBP_JPY: prev_units=+0 prev_state=+0 out=1.0000 -> state=+1 target=+100 delta=+100
+  EUR_GBP: prev_units=+0 prev_state=+0 out=1.0000 -> state=+1 target=+100 delta=+100
+  EUR_CHF: prev_units=+0 prev_state=+0 out=0.0000 -> state=-1 target=-100 delta=-100
+  EUR_AUD: prev_units=+0 prev_state=+0 out=1.0000 -> state=+1 target=+100 delta=+100
+  EUR_CAD: prev_units=+0 prev_state=+0 out=0.9994 -> state=+1 target=+100 delta=+100
+  GBP_CHF: prev_units=+0 prev_state=+0 out=0.9767 -> state=+1 target=+100 delta=+100
+  AUD_JPY: prev_units=+0 prev_state=+0 out=1.0000 -> state=+1 target=+100 delta=+100
+  AUD_CHF: prev_units=+0 prev_state=+0 out=0.0000 -> state=-1 target=-100 delta=-100
+  CAD_JPY: prev_units=+0 prev_state=+0 out=0.0000 -> state=-1 target=-100 delta=-100
+  NZD_JPY: prev_units=+0 prev_state=+0 out=1.0000 -> state=+1 target=+100 delta=+100
+  GBP_AUD: prev_units=+0 prev_state=+0 out=0.7009 -> state=+0 target=+0 delta=+0
+  AUD_NZD: prev_units=+0 prev_state=+0 out=0.9997 -> state=+1 target=+100 delta=+100
+order: EUR_USD delta=100 -> ok
+order: USD_JPY delta=-100 -> ok
+order: AUD_USD delta=100 -> ok
+order: USD_CHF delta=-100 -> ok
+order: USD_CAD delta=-100 -> ok
+order: NZD_USD delta=-100 -> ok
+order: EUR_JPY delta=100 -> ok
+order: GBP_JPY delta=100 -> ok
+order: EUR_GBP delta=100 -> ok
+order: EUR_CHF delta=-100 -> ok
+order: EUR_AUD delta=100 -> ok
+order: EUR_CAD delta=100 -> ok
+order: GBP_CHF delta=100 -> ok
+order: AUD_JPY delta=100 -> ok
+order: AUD_CHF delta=-100 -> ok
+order: CAD_JPY delta=-100 -> ok
+order: NZD_JPY delta=100 -> ok
+order: AUD_NZD delta=100 -> ok
+[heartbeat] 2025-10-21T00:50:38.994068+00:00 waiting 276.0s for next M5+grace
+[heartbeat] 2025-10-21T00:51:39.011898+00:00 waiting 216.0s for next M5+grace
+[heartbeat] 2025-10-21T00:52:39.028143+00:00 waiting 156.0s for next M5+grace
+[heartbeat] 2025-10-21T00:53:39.052986+00:00 waiting 95.9s for next M5+grace
+[heartbeat] 2025-10-21T00:54:39.069405+00:00 waiting 35.9s for next M5+grace
+2025-10-21T00:55:38.143253+00:00 close=2025-10-21 00:50:00+00:00 decisions:
+  EUR_USD: prev_units=+100 prev_state=+1 out=1.0000 -> state=+1 target=+100 delta=+0
+  USD_JPY: prev_units=-100 prev_state=-1 out=0.0027 -> state=-1 target=-100 delta=+0
+  GBP_USD: prev_units=+0 prev_state=+0 out=0.2579 -> state=+0 target=+0 delta=+0
+  AUD_USD: prev_units=+100 prev_state=+1 out=0.8710 -> state=+1 target=+100 delta=+0
+  USD_CHF: prev_units=-100 prev_state=-1 out=0.0000 -> state=-1 target=-100 delta=+0
+  USD_CAD: prev_units=-100 prev_state=-1 out=0.0020 -> state=-1 target=-100 delta=+0
+  NZD_USD: prev_units=-100 prev_state=-1 out=0.0000 -> state=-1 target=-100 delta=+0
+  EUR_JPY: prev_units=+100 prev_state=+1 out=0.9978 -> state=+1 target=+100 delta=+0
+  GBP_JPY: prev_units=+100 prev_state=+1 out=1.0000 -> state=+1 target=+100 delta=+0
+  EUR_GBP: prev_units=+100 prev_state=+1 out=1.0000 -> state=+1 target=+100 delta=+0
+  EUR_CHF: prev_units=-100 prev_state=-1 out=0.0000 -> state=-1 target=-100 delta=+0
+  EUR_AUD: prev_units=+100 prev_state=+1 out=1.0000 -> state=+1 target=+100 delta=+0
+  EUR_CAD: prev_units=+100 prev_state=+1 out=0.9994 -> state=+1 target=+100 delta=+0
+  GBP_CHF: prev_units=+100 prev_state=+1 out=0.9734 -> state=+1 target=+100 delta=+0
+  AUD_JPY: prev_units=+100 prev_state=+1 out=1.0000 -> state=+1 target=+100 delta=+0
+  AUD_CHF: prev_units=-100 prev_state=-1 out=0.0000 -> state=-1 target=-100 delta=+0
+  CAD_JPY: prev_units=-100 prev_state=-1 out=0.0000 -> state=-1 target=-100 delta=+0
+  NZD_JPY: prev_units=+100 prev_state=+1 out=1.0000 -> state=+1 target=+100 delta=+0
+  GBP_AUD: prev_units=+0 prev_state=+0 out=0.7047 -> state=+0 target=+0 delta=+0
+  AUD_NZD: prev_units=+100 prev_state=+1 out=0.9998 -> state=+1 target=+100 delta=+0
+  no orders needed (in sync)
+[heartbeat] 2025-10-21T00:55:38.143516+00:00 waiting 276.9s for next M5+grace
+[heartbeat] 2025-10-21T00:56:38.156545+00:00 waiting 216.8s for next M5+grace
+[heartbeat] 2025-10-21T00:57:38.171621+00:00 waiting 156.8s for next M5+grace
+[heartbeat] 2025-10-21T00:58:38.184896+00:00 waiting 96.8s for next M5+grace
+[heartbeat] 2025-10-21T00:59:38.197772+00:00 waiting 36.8s for next M5+grace
+2025-10-21T01:00:45.677436+00:00 close=2025-10-21 00:55:00+00:00 decisions:
+  EUR_USD: prev_units=+100 prev_state=+1 out=1.0000 -> state=+1 target=+100 delta=+0
+  USD_JPY: prev_units=-100 prev_state=-1 out=0.0028 -> state=-1 target=-100 delta=+0
+  GBP_USD: prev_units=+0 prev_state=+0 out=0.2077 -> state=+0 target=+0 delta=+0
+  AUD_USD: prev_units=+100 prev_state=+1 out=0.8622 -> state=+1 target=+100 delta=+0
+  USD_CHF: prev_units=-100 prev_state=-1 out=0.0000 -> state=-1 target=-100 delta=+0
+  USD_CAD: prev_units=-100 prev_state=-1 out=0.0022 -> state=-1 target=-100 delta=+0
+  NZD_USD: prev_units=-100 prev_state=-1 out=0.0000 -> state=-1 target=-100 delta=+0
+  EUR_JPY: prev_units=+100 prev_state=+1 out=0.9974 -> state=+1 target=+100 delta=+0
+  GBP_JPY: prev_units=+100 prev_state=+1 out=1.0000 -> state=+1 target=+100 delta=+0
+  EUR_GBP: prev_units=+100 prev_state=+1 out=1.0000 -> state=+1 target=+100 delta=+0
+  EUR_CHF: prev_units=-100 prev_state=-1 out=0.0000 -> state=-1 target=-100 delta=+0
+  EUR_AUD: prev_units=+100 prev_state=+1 out=1.0000 -> state=+1 target=+100 delta=+0
+  EUR_CAD: prev_units=+100 prev_state=+1 out=0.9993 -> state=+1 target=+100 delta=+0
+  GBP_CHF: prev_units=+100 prev_state=+1 out=0.9734 -> state=+1 target=+100 delta=+0
+  AUD_JPY: prev_units=+100 prev_state=+1 out=1.0000 -> state=+1 target=+100 delta=+0
+  AUD_CHF: prev_units=-100 prev_state=-1 out=0.0000 -> state=-1 target=-100 delta=+0
+  CAD_JPY: prev_units=-100 prev_state=-1 out=0.0000 -> state=-1 target=-100 delta=+0
+  NZD_JPY: prev_units=+100 prev_state=+1 out=1.0000 -> state=+1 target=+100 delta=+0
+  GBP_AUD: prev_units=+0 prev_state=+0 out=0.6841 -> state=+0 target=+0 delta=+0
+  AUD_NZD: prev_units=+100 prev_state=+1 out=0.9999 -> state=+1 target=+100 delta=+0
+  no orders needed (in sync)
+[heartbeat] 2025-10-21T01:00:45.678028+00:00 waiting 269.3s for next M5+grace
+[heartbeat] 2025-10-21T01:01:45.694220+00:00 waiting 209.3s for next M5+grace
+[heartbeat] 2025-10-21T01:02:45.709642+00:00 waiting 149.3s for next M5+grace
+[heartbeat] 2025-10-21T01:03:45.724411+00:00 waiting 89.3s for next M5+grace
+[heartbeat] 2025-10-21T01:04:45.745284+00:00 waiting 29.3s for next M5+grace
+2025-10-21T01:05:39.677053+00:00 close=2025-10-21 01:00:00+00:00 decisions:
+  EUR_USD: prev_units=+100 prev_state=+1 out=1.0000 -> state=+1 target=+100 delta=+0
+  USD_JPY: prev_units=-100 prev_state=-1 out=0.0025 -> state=-1 target=-100 delta=+0
+  GBP_USD: prev_units=+0 prev_state=+0 out=0.1844 -> state=-1 target=-100 delta=-100
+  AUD_USD: prev_units=+100 prev_state=+1 out=0.8612 -> state=+1 target=+100 delta=+0
+  USD_CHF: prev_units=-100 prev_state=-1 out=0.0000 -> state=-1 target=-100 delta=+0
+  USD_CAD: prev_units=-100 prev_state=-1 out=0.0025 -> state=-1 target=-100 delta=+0
+  NZD_USD: prev_units=-100 prev_state=-1 out=0.0000 -> state=-1 target=-100 delta=+0
+  EUR_JPY: prev_units=+100 prev_state=+1 out=0.9972 -> state=+1 target=+100 delta=+0
+  GBP_JPY: prev_units=+100 prev_state=+1 out=1.0000 -> state=+1 target=+100 delta=+0
+  EUR_GBP: prev_units=+100 prev_state=+1 out=1.0000 -> state=+1 target=+100 delta=+0
+  EUR_CHF: prev_units=-100 prev_state=-1 out=0.0000 -> state=-1 target=-100 delta=+0
+  EUR_AUD: prev_units=+100 prev_state=+1 out=1.0000 -> state=+1 target=+100 delta=+0
+  EUR_CAD: prev_units=+100 prev_state=+1 out=0.9992 -> state=+1 target=+100 delta=+0
+  GBP_CHF: prev_units=+100 prev_state=+1 out=0.9713 -> state=+1 target=+100 delta=+0
+  AUD_JPY: prev_units=+100 prev_state=+1 out=1.0000 -> state=+1 target=+100 delta=+0
+  AUD_CHF: prev_units=-100 prev_state=-1 out=0.0000 -> state=-1 target=-100 delta=+0
+  CAD_JPY: prev_units=-100 prev_state=-1 out=0.0000 -> state=-1 target=-100 delta=+0
+  NZD_JPY: prev_units=+100 prev_state=+1 out=1.0000 -> state=+1 target=+100 delta=+0
+  GBP_AUD: prev_units=+0 prev_state=+0 out=0.6905 -> state=+0 target=+0 delta=+0
+  AUD_NZD: prev_units=+100 prev_state=+1 out=0.9998 -> state=+1 target=+100 delta=+0
+order: GBP_USD delta=-100 -> ok
+[heartbeat] 2025-10-21T01:05:39.722049+00:00 waiting 275.3s for next M5+grace
+[heartbeat] 2025-10-21T01:06:39.739711+00:00 waiting 215.3s for next M5+grace
+[heartbeat] 2025-10-21T01:07:39.757249+00:00 waiting 155.2s for next M5+grace

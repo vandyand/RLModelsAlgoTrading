@@ -1,0 +1,35 @@
+name: local-broker-ci
+
+on:
+  push:
+    paths:
+      - "local-broker/**"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    paths:
+      - "local-broker/**"
+      - ".github/workflows/ci.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./local-broker
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+      - name: Verify formatting
+        run: |
+          fmt_out=$(gofmt -l ./)
+          if [ -n "$fmt_out" ]; then
+            echo "Files need gofmt:"
+            echo "$fmt_out"
+            exit 1
+          fi
+      - name: Go Test
+        run: go test ./...
