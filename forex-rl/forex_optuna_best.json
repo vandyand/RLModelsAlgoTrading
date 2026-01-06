@@ -1,0 +1,55 @@
+{
+  "batch_size": 128,
+  "best_attrs": {
+    "val_avg_daily_reward": 0.23001720404155016,
+    "val_avg_daily_reward_repeats": [
+      0.1113448556256937,
+      0.3112596948631108,
+      0.26744706163584603
+    ]
+  },
+  "best_params": {
+    "actor_sigma": 0.5633172288413832,
+    "entropy_coef": 0.00012283264552830035,
+    "gamma": 0.9739418024134797,
+    "max_units": 359.1934686385632,
+    "policy_depth": 2,
+    "policy_hidden_0": 512,
+    "policy_hidden_1": 64,
+    "reward_scale": 4.869757758895732,
+    "value_coef": 0.2640753441376949,
+    "value_depth": 1,
+    "value_hidden_0": 384
+  },
+  "best_value": 0.23001720404155016,
+  "end": "2025-12-31",
+  "epochs": 8,
+  "repeats": 3,
+  "seed_base": 42,
+  "start": "2025-01-01",
+  "storage": "in-memory",
+  "study_name": "forex_ac_optuna",
+  "symbols": [
+    "EUR_USD",
+    "USD_JPY",
+    "GBP_USD",
+    "AUD_USD",
+    "USD_CHF",
+    "USD_CAD",
+    "NZD_USD",
+    "EUR_JPY",
+    "GBP_JPY",
+    "EUR_GBP",
+    "EUR_CHF",
+    "EUR_AUD",
+    "EUR_CAD",
+    "GBP_CHF",
+    "AUD_JPY",
+    "AUD_CHF",
+    "CAD_JPY",
+    "NZD_JPY",
+    "GBP_AUD",
+    "AUD_NZD"
+  ],
+  "val_frac": 0.2
+}

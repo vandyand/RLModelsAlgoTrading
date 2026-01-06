@@ -1,0 +1,35 @@
+{
+  "batch_size": 128,
+  "best_attrs": {
+    "val_avg_daily_reward": 0.03884175331080081,
+    "val_avg_daily_reward_repeats": [
+      0.03095679809465199,
+      0.034020130126107787,
+      0.05154833171164264
+    ]
+  },
+  "best_params": {
+    "actor_sigma": 0.39087391905459895,
+    "entropy_coef": 0.0003301012870102508,
+    "gamma": 0.9539031341107087,
+    "max_notional": 3.1041367665585593,
+    "policy_depth": 2,
+    "policy_hidden_0": 320,
+    "policy_hidden_1": 64,
+    "reward_scale": 2.55386988007509,
+    "value_coef": 0.6556909727075034,
+    "value_depth": 2,
+    "value_hidden_0": 192,
+    "value_hidden_1": 512
+  },
+  "best_value": 0.03884175331080081,
+  "end": "2025-12-31",
+  "epochs": 12,
+  "repeats": 3,
+  "seed_base": 42,
+  "start": "2024-01-01",
+  "storage": "in-memory",
+  "study_name": "equities_ac_optuna",
+  "universe_json": "/home/kingjames/rl-trader/forex-rl/equities_universe_top100_five_years.json",
+  "val_frac": 0.3
+}

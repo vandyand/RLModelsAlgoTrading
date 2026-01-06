@@ -1,0 +1,55 @@
+{
+  "batch_size": 128,
+  "best_attrs": {
+    "val_avg_daily_reward": 0.020571967989810185,
+    "val_avg_daily_reward_repeats": [
+      0.030479108017697064,
+      0.012181932644835636,
+      0.01905486330689786
+    ]
+  },
+  "best_params": {
+    "actor_sigma": 0.22788498409809743,
+    "entropy_coef": 0.002244808886146323,
+    "gamma": 0.9755806935714563,
+    "max_notional": 4.903147361976622,
+    "policy_depth": 2,
+    "policy_hidden_0": 384,
+    "policy_hidden_1": 448,
+    "reward_scale": 4.54064607326927,
+    "value_coef": 0.9909684156782567,
+    "value_depth": 3,
+    "value_hidden_0": 512,
+    "value_hidden_1": 256,
+    "value_hidden_2": 512
+  },
+  "best_value": 0.020571967989810185,
+  "end": "2025-12-31",
+  "epochs": 8,
+  "repeats": 3,
+  "seed_base": 42,
+  "start": "2024-01-01",
+  "storage": "in-memory",
+  "study_name": "crypto_ac_optuna",
+  "symbols": [
+    "AAVE/USD",
+    "AVAX/USD",
+    "BAT/USD",
+    "BCH/USD",
+    "BTC/USD",
+    "CRV/USD",
+    "DOGE/USD",
+    "DOT/USD",
+    "ETH/USD",
+    "GRT/USD",
+    "LINK/USD",
+    "LTC/USD",
+    "SHIB/USD",
+    "SUSHI/USD",
+    "UNI/USD",
+    "XRP/USD",
+    "XTZ/USD",
+    "YFI/USD"
+  ],
+  "val_frac": 0.2
+}
