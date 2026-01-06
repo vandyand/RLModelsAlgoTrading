@@ -65,6 +65,7 @@ nq-historical*.zip
 # Node / PHP vendor (for ref demos, if re-installed)
 node_modules/
 vendor/
+ref/alpaca-py/
 
 # OS files
 .DS_Store
