@@ -21,6 +21,7 @@ env/
 logs/
 *.log
 nohup.out
+forex-rl/train.out
 
 # Checkpoints & model weights
 checkpoints/
@@ -41,6 +42,19 @@ checkpoints/
 *.npy
 *.parquet
 *.feather
+
+# Walk-forward optimization outputs and caches
+forex-rl/wfo/runs/
+forex-rl/wfo/cache/
+forex-rl/wfo/optuna_search_results/
+**/wfo/runs/
+**/wfo/cache/
+**/wfo/optuna_search_results/
+
+# Large historical data snapshots
+nq-historical/
+forex-rl/nq-historical/
+nq-historical*.zip
 
 # Backup / temporary files
 *.bak
