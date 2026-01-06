@@ -13,18 +13,21 @@ class OandaRestCandlesAdapter:
     """
 
     def __init__(self, instrument: str, granularity: str = "M1", environment: str = "practice", access_token: Optional[str] = None):
-        # OANDA expects instrument names with underscore, e.g., EUR_USD
-        self.instrument = (instrument or "").replace('/', '_')
+        # Allow overriding the REST base URL to hit a local cache or broker that emulates OANDA.
+        base_override = os.environ.get("OANDA_REST_BASE_URL") or os.environ.get("CANDLE_CACHE_BASE_URL")
+        if base_override:
+            # When talking to the local candle cache, keep the instrument string
+            # as-is so we can support non-OANDA naming such as BTC/USD.
+            self.instrument = (instrument or "")
+            self.base_url = str(base_override).rstrip("/")
+        else:
+            # OANDA expects instrument names with underscore, e.g., EUR_USD
+            self.instrument = (instrument or "").replace('/', '_')
+            self.base_url = "https://api-fxpractice.oanda.com" if environment == "practice" else "https://api-fxtrade.oanda.com"
         self.granularity = granularity
         self.environment = environment
         # Prefer explicit token, else fall back to common env vars
         self.access_token = access_token or os.environ.get("OANDA_DEMO_KEY") or os.environ.get("OANDA_ACCESS_TOKEN")
-        # Allow overriding the REST base URL to hit a local cache or broker that emulates OANDA.
-        base_override = os.environ.get("OANDA_REST_BASE_URL") or os.environ.get("CANDLE_CACHE_BASE_URL")
-        if base_override:
-            self.base_url = str(base_override).rstrip("/")
-        else:
-            self.base_url = "https://api-fxpractice.oanda.com" if environment == "practice" else "https://api-fxtrade.oanda.com"
         self.session = requests.Session()
         if self.access_token:
             # When pointing at the local cache service, this header is harmless; the cache

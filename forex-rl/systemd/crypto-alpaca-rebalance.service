@@ -1,0 +1,26 @@
+[Unit]
+Description=Crypto RL Alpaca paper rebalance (nightly after midnight ET)
+After=network-online.target candle-cache.service
+Wants=network-online.target candle-cache.service
+
+[Service]
+Type=oneshot
+# Env file should provide at least:
+#   ALPACA_API_KEY_ID
+#   ALPACA_API_SECRET_KEY
+# and optionally:
+#   CANDLE_CACHE_BASE_URL (defaults to http://127.0.0.1:9100)
+EnvironmentFile=-/home/kingjames/rl-trader/.secrets/equities-alpaca.env
+WorkingDirectory=/home/kingjames/rl-trader/forex-rl
+# Run crypto offline inference (with TCN features) and align Alpaca crypto
+# positions to the resulting targets.
+ExecStart=/bin/bash -lc '/home/kingjames/rl-trader/.venv/bin/python -m actor-critic.crypto_offline_infer --use-tcn | /home/kingjames/rl-trader/.venv/bin/python -m actor-critic.crypto_alpaca_align_to_targets --targets - --scale-notional 500.0 --deadband-usd 0.50'
+StandardOutput=journal
+StandardError=journal
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target
+

@@ -1,0 +1,22 @@
+[Unit]
+Description=OANDA candle cache HTTP service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=-/home/kingjames/rl-trader/.secrets/candle-cache.env
+# Project under /home/kingjames/rl-trader with .venv; keys loaded from .secrets/candle-cache.env
+WorkingDirectory=/home/kingjames/rl-trader/forex-rl
+ExecStart=/home/kingjames/rl-trader/.venv/bin/python candle_cache_service.py --host 127.0.0.1 --port 9100
+StandardOutput=journal
+StandardError=journal
+Restart=always
+RestartSec=2
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target
+

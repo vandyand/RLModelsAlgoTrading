@@ -1,0 +1,22 @@
+[Unit]
+Description=OANDA demo account NAV and positions sampler
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Reuse the same env file as the TCN multi-policy live trader for credentials.
+EnvironmentFile=-/home/kingjames/rl-trader/.secrets/tcn-multi-live.env
+WorkingDirectory=/home/kingjames/rl-trader/forex-rl
+ExecStart=/home/kingjames/rl-trader/.venv/bin/python tools/oanda_nav_positions_sampler.py --interval-secs 300 --environment practice --out oanda_nav_positions.jsonl --out-dir logs
+StandardOutput=journal
+StandardError=journal
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target
+

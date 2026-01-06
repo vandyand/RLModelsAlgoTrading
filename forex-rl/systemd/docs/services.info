@@ -1,0 +1,117 @@
+# Install
+sudo install -m 0644 -o root -g root forex-rl/systemd/candle-cache.service /etc/systemd/system/candle-cache.service
+sudo install -m 0644 -o root -g root forex-rl/systemd/tcn-multi-live.service /etc/systemd/system/tcn-multi-live.service
+
+# Start
+sudo systemctl daemon-reload
+sudo systemctl enable --now candle-cache.service
+sudo systemctl enable --now tcn-multi-live.service
+
+# Restart
+sudo systemctl restart candle-cache.service 
+sudo systemctl restart tcn_multi-live.service
+
+# Status
+systemctl status candle-cache.service
+systemctl status tcn-multi-live.service
+
+# Logs
+journalctl -u candle-cache.service -n 50
+journalctl -u tcn-multi-live.service -n 50
+
+# Updating env vars
+sudo systemctl set-environment PAUSE_LIVE_TRADER=1
+# -- or --
+vim /home/kingjames/rl-trader/.secrets/tcn-multi-live.env
+# add: PAUSE_LIVE_TRADER=1
+
+sudo systemctl restart tcn-multi-live.service
+
+
+# List timers
+sudo systemctl list-timers
+sudo systemctl list-timers 'crypto-alpaca-rebalance*'
+
+
+# Deactivate a service (and/or timer)
+
+## Stop it immediately (no more runs this boot):
+
+sudo systemctl stop crypto-alpaca-rebalance.service
+sudo systemctl stop crypto-alpaca-rebalance.timer
+
+## Prevent it from starting automatically in future:
+
+sudo systemctl disable crypto-alpaca-rebalance.service
+sudo systemctl disable crypto-alpaca-rebalance.timer
+
+## You can combine stop+disable with:
+
+sudo systemctl disable --now crypto-alpaca-rebalance.timer
+sudo systemctl disable --now crypto-alpaca-rebalance.service
+
+# Delete 
+
+## Delete the unit files from /etc/systemd/system:
+
+sudo rm /etc/systemd/system/crypto-alpaca-rebalance.timer
+sudo rm /etc/systemd/system/crypto-alpaca-rebalance.service
+
+## Reload systemd so it forgets them:
+
+sudo systemctl daemon-reload
+
+## (Optional) Verify they’re gone:
+
+sudo systemctl list-unit-files | grep crypto-alpaca
+sudo systemctl list-timers | grep crypto-alpaca
+
+  List services
+
+  • All loaded service unit files (enabled/disabled, not just running):
+
+
+  sudo systemctl list-unit-files --type=service
+
+  • Services that are currently active (running or exited oneshot):
+
+
+  sudo systemctl list-units --type=service
+
+  • Filter by name (e.g. all your Alpaca units):
+
+
+  sudo systemctl list-units --type=service | grep alpaca
+
+
+  List timers
+
+  • All active timers (including next/last run times):
+
+
+  sudo systemctl list-timers
+
+  • Filter timers by name:
+
+
+  sudo systemctl list-timers 'crypto-alpaca-rebalance*'
+  sudo systemctl list-timers 'equities-alpaca-rebalance*'
+
+
+  Check if a specific service is running
+
+  • Status view (most useful):
+
+
+  sudo systemctl status crypto-alpaca-rebalance.service
+  sudo systemctl status equities-alpaca-rebalance.service
+
+  Look at the Active: line:
+  • active (running) → currently running (for long-lived units)
+  • active (exited) → oneshot that finished successfully
+  • inactive / failed → not running.
+  • Machine-readable check (exit code only):
+
+
+  sudo systemctl is-active crypto-alpaca-rebalance.service
+  # prints "active", "inactive", or "failed" and sets exit status accordingly

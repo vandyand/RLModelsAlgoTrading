@@ -1,0 +1,13 @@
+[Unit]
+Description=Run Forex RL OANDA paper rebalance Sun–Thu at 18:16 Eastern
+
+[Timer]
+Unit=forex-oanda-rebalance.service
+# Run Sunday through Thursday at 18:16 America/New_York (handles DST automatically).
+OnCalendar=Sun..Thu 18:16
+Timezone=America/New_York
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+

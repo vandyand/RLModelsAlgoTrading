@@ -1,0 +1,13 @@
+[Unit]
+Description=Run equities RL Alpaca paper rebalance at market open on weekdays
+
+[Timer]
+Unit=equities-alpaca-rebalance.service
+# Times are in the system's local timezone. Adjust as needed.
+# This example runs at 09:31 Monday through Friday (e.g., 1 minute after US market open in local time).
+OnCalendar=Mon..Fri 09:31
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+

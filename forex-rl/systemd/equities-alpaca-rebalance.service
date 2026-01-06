@@ -1,0 +1,24 @@
+[Unit]
+Description=Equities RL Alpaca paper rebalance (daily at market open)
+After=network-online.target candle-cache.service
+Wants=network-online.target candle-cache.service
+
+[Service]
+Type=oneshot
+# Env file should provide at least:
+#   ALPACA_API_KEY_ID
+#   ALPACA_API_SECRET_KEY
+# and optionally:
+#   CANDLE_CACHE_BASE_URL (defaults to http://127.0.0.1:9100)
+EnvironmentFile=-/home/kingjames/rl-trader/.secrets/equities-alpaca.env
+WorkingDirectory=/home/kingjames/rl-trader/forex-rl
+ExecStart=/bin/bash -lc '/home/kingjames/rl-trader/.venv/bin/python -m actor-critic.equities_offline_infer --checkpoint actor-critic/checkpoints/equities_offline_ac.pt --universe-json equities_universe_top100_five_years.json | /home/kingjames/rl-trader/.venv/bin/python -m actor-critic.equities_alpaca_align_to_targets --targets - --scale-notional 2500.0 --deadband-usd 0.5 --long-short'
+StandardOutput=journal
+StandardError=journal
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target
+

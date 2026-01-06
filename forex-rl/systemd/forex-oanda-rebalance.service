@@ -1,0 +1,28 @@
+[Unit]
+Description=Forex RL OANDA paper rebalance (Sun-Thu 18:16 ET)
+After=network-online.target candle-cache.service
+Wants=network-online.target candle-cache.service
+
+[Service]
+Type=oneshot
+# Env file should provide at least:
+#   OANDA_DEMO_ACCOUNT_ID
+#   OANDA_DEMO_KEY
+# and optionally:
+#   CANDLE_CACHE_BASE_URL (defaults to http://127.0.0.1:9100)
+EnvironmentFile=-/home/kingjames/rl-trader/.secrets/tcn-multi-live.env
+WorkingDirectory=/home/kingjames/rl-trader/forex-rl
+ExecStart=/bin/bash -lc '\
+  /home/kingjames/rl-trader/.venv/bin/python -m actor-critic.forex_offline_infer \
+  | /home/kingjames/rl-trader/.venv/bin/python -m actor-critic.forex_oanda_align_to_targets \
+      --targets - --environment practice --scale-notional 2500 --deadband-usd 1.0 \
+'
+StandardOutput=journal
+StandardError=journal
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target
+

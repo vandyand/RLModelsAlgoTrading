@@ -1,0 +1,14 @@
+[Unit]
+Description=Run crypto RL Alpaca paper rebalance nightly at 00:01 Eastern
+
+[Timer]
+Unit=crypto-alpaca-rebalance.service
+# Times are interpreted in the specified timezone.
+# This runs every day at 00:01 America/New_York (handles DST automatically).
+OnCalendar=*-*-* 00:01
+Timezone=America/New_York
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+
