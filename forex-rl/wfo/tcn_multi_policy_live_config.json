@@ -1,0 +1,81 @@
+{
+  "environment": "practice",
+  "poll_seconds": 60.0,
+  "instruments": [
+    {
+      "name": "EUR_USD",
+      "base_config": "wfo/optuna_search_results/optimal_eur_usd_20251230-215508.json",
+      "units_per_side": 200
+    },
+    {
+      "name": "AUD_USD",
+      "base_config": "wfo/optuna_search_results/optimal_aud_usd_20251230-220931.json",
+      "units_per_side": 200
+    },
+    {
+      "name": "GBP_USD",
+      "base_config": "wfo/optuna_search_results/optimal_gbp_usd_20251230-220459.json",
+      "units_per_side": 200
+    },
+    {
+      "name": "USD_JPY",
+      "base_config": "wfo/optuna_search_results/optimal_usd_jpy_20251230-215831.json",
+      "units_per_side": 200
+    },
+    {
+      "name": "EUR_JPY",
+      "base_config": "wfo/optuna_search_results/optimal_eur_jpy_20251230-184622.json",
+      "units_per_side": 200
+    },
+    {
+      "name": "AUD_JPY",
+      "base_config": "wfo/optuna_search_results/optimal_aud_jpy_20251230-185639.json",
+      "units_per_side": 200
+    },
+    {
+      "name": "EUR_AUD",
+      "base_config": "wfo/optuna_search_results/optimal_eur_aud_20251230-185213.json",
+      "units_per_side": 200
+    },
+    {
+      "name": "EUR_CAD",
+      "base_config": "wfo/optuna_search_results/optimal_eur_cad_20251230-185317.json",
+      "units_per_side": 200
+    },
+    {
+      "name": "EUR_CHF",
+      "base_config": "wfo/optuna_search_results/optimal_eur_chf_20251230-185032.json",
+      "units_per_side": 200
+    },
+    {
+      "name": "EUR_GBP",
+      "base_config": "wfo/optuna_search_results/optimal_eur_gbp_20251230-184913.json",
+      "units_per_side": 200
+    },
+    {
+      "name": "GBP_CHF",
+      "base_config": "wfo/optuna_search_results/optimal_gbp_chf_20251230-185443.json",
+      "units_per_side": 200
+    },
+    {
+      "name": "GBP_JPY",
+      "base_config": "wfo/optuna_search_results/optimal_gbp_jpy_20251230-184752.json",
+      "units_per_side": 200
+    },
+    {
+      "name": "NZD_USD",
+      "base_config": "wfo/optuna_search_results/optimal_nzd_usd_20251230-184439.json",
+      "units_per_side": 200
+    },
+    {
+      "name": "USD_CAD",
+      "base_config": "wfo/optuna_search_results/optimal_usd_cad_20251230-221632.json",
+      "units_per_side": 200
+    },
+    {
+      "name": "USD_CHF",
+      "base_config": "wfo/optuna_search_results/optimal_usd_chf_20251230-221237.json",
+      "units_per_side": 200
+    }
+  ]
+}

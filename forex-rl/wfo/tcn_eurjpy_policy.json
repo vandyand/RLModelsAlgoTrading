@@ -1,0 +1,50 @@
+{
+  "adapter": "tcn-action-eurusd-policy-debug",
+  "adapter_spec": "wfo.adapters.tcn_nq_action:TCNActionNQAdapter",
+
+  "start": "2025-12-01",
+  "end": "2025-12-28",
+  "train_n": 7.0,
+  "val_n": 1.0,
+  "step_n": 1.0,
+  "unit": "days",
+  "windows_limit": 12,
+
+  "base_gran": "M5",
+  "out_dir": "wfo/runs",
+
+  "tcn_instrument": "EUR_JPY",
+  "grans": "M5,H1,H4",
+  "tcn_base_gran": "M5",
+
+  "tcn_lookback": 32,
+  "tcn_target_horizon": 12,
+  "epochs": 3,
+  "lr": 0.001,
+  "tcn_hidden": 128,
+  "tcn_kernel": 1,
+  "tcn_blocks": 1,
+  "tcn_dropout": 0.05,
+
+  "mlp_layers": [256, 128],
+
+  "label_long_thresh": 0.0001,
+  "label_short_thresh": -0.0001,
+  "label_mode": "bps",
+  "label_long_quantile": 0.65,
+  "label_short_quantile": 0.35,
+
+  "tcn_trade_cost_bps": 1.0,
+
+  "nq_enter_long": 0.008,
+  "nq_exit_long": 0.006,
+  "nq_enter_short": -0.008,
+  "nq_exit_short": -0.006,
+
+  "debug_force_all_long": false,
+
+  "mode": "fast",
+  "no_chart": false,
+  "chart_every": 1,
+  "quiet": false
+}

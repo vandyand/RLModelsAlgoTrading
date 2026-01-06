@@ -1,0 +1,62 @@
+{
+  "adapter": "tcn-action-eurusd-policy-debug",
+  "adapter_spec": "wfo.adapters.tcn_nq_action:TCNActionNQAdapter",
+  "base_gran": "M5",
+  "chart_every": 1,
+  "debug_force_all_long": false,
+  "end": "2025-12-28",
+  "enter_dist": [
+    0.001,
+    0.001,
+    0.1
+  ],
+  "epochs": 3,
+  "exit_frac": [
+    0.05,
+    0.05,
+    0.95
+  ],
+  "grans": "M5,H1,H4",
+  "label_long_quantile": 0.95,
+  "label_long_thresh": 0.0003401055926780148,
+  "label_mode": "quantile",
+  "label_quantile_dist": [
+    0.05,
+    0.05,
+    0.95
+  ],
+  "label_short_quantile": 0.050000000000000044,
+  "label_short_thresh": -0.0003401055926780148,
+  "label_thresh": [
+    5e-05,
+    0.001
+  ],
+  "lr": 0.001,
+  "mlp_layers": [
+    256,
+    224
+  ],
+  "mode": "fast",
+  "no_chart": false,
+  "nq_enter_long": 0.07700000000000005,
+  "nq_enter_short": -0.07700000000000005,
+  "nq_exit_long": 0.07315000000000008,
+  "nq_exit_short": -0.07315000000000008,
+  "out_dir": "wfo/runs",
+  "quiet": false,
+  "start": "2025-12-01",
+  "step_n": 1.0,
+  "tcn_base_gran": "M5",
+  "tcn_blocks": 1,
+  "tcn_dropout": 0.05,
+  "tcn_hidden": 64.0,
+  "tcn_instrument": "EUR_JPY",
+  "tcn_kernel": 1,
+  "tcn_lookback": 44.0,
+  "tcn_target_horizon": 38.0,
+  "tcn_trade_cost_bps": 2.0,
+  "train_n": 11.0,
+  "unit": "days",
+  "val_n": 1.0,
+  "windows_limit": 12
+}

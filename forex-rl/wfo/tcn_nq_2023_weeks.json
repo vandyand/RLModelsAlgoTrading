@@ -1,0 +1,53 @@
+{
+  "adapter": "tcn-scalar-threshold",
+  "adapter_spec": "wfo.adapters.tcn_nq_action:TCNActionNQAdapter",
+  "start": "2023-01-01",
+  "end": "2023-12-31",
+  "train_n": 3.0,
+  "val_n": 1.0,
+  "step_n": 1.0,
+  "unit": "weeks",
+  "windows_limit": 0,
+  "base_gran": "M15",
+  "out_dir": "wfo/runs",
+  "parallel": 0,
+
+  "tcn_instrument": "NQ",
+  "grans": "M15,H1,D",
+  "tcn_base_gran": "M15",
+
+  "tcn_lookback": 30,
+  "tcn_target_horizon": 30,
+  "epochs": 3,
+  "lr": 0.001,
+  "tcn_hidden": 128,
+  "tcn_kernel": 1,
+  "tcn_blocks": 1,
+  "tcn_dropout": 0.06738135694257803,
+
+  "label_long_thresh": 0.0007214131103349863,
+  "label_short_thresh": -0.0006928715440570291,
+  "label_mode": "quantile",
+  "label_long_quantile": 0.75,
+  "label_short_quantile": 0.25,
+  "tcn_trade_cost_bps": 1.0,
+  "nq_ret_thresh": 0.00087947055496732,
+  "nq_vol_lookback": 48,
+  "nq_z_thresh": 1.5003184833052003,
+  "nq_trend_fast": 0,
+  "nq_trend_slow": 0,
+  "nq_trend_eps": 0.0005,
+  "nq_enter_long": 0.095,
+  "nq_exit_long": 0.09,
+  "nq_enter_short": -0.095,
+  "nq_exit_short": -0.09,
+
+  "candle_cache_base": "http://127.0.0.1:9100",
+
+  "debug_force_all_long": false,
+
+  "mode": "fast",
+  "no_chart": true,
+  "chart_every": 1,
+  "quiet": true
+}

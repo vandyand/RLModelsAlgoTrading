@@ -10,6 +10,9 @@ from datetime import datetime, timezone
 import time
 import sys
 import importlib
+import hashlib
+import pickle
+from pathlib import Path
 
 
 class WFOAdapter(Protocol):
@@ -66,6 +69,12 @@ class WFOConfig:
     quiet: bool = False
     preload_next: bool = False
     mode: str = "thorough"
+    # When True, ignore `start` / `end` and instead construct windows by
+    # walking backwards from "yesterday" using the geometry
+    # (train_n/val_n/step_n) and `windows_limit`, then run them in
+    # chronological order. This is useful for "most recent N windows"
+    # sweeps without hard-coding dates in configs.
+    rolling_from_yesterday: bool = False
 
 
 def _downsample(y: List[float], target: int) -> List[float]:
@@ -126,6 +135,68 @@ def _render_chart(y: List[float], width: int = 80, height: int = 10) -> str:
     return _ascii_chart(y_use, width=width, height=height)
 
 
+# -----------------------------------------------------------------------------
+# Optional on-disk window cache for adapter.load_window
+# -----------------------------------------------------------------------------
+
+_WINDOW_CACHE_ENABLED = os.environ.get("WFO_WINDOW_CACHE", "1") == "1"
+_WINDOW_CACHE_DIR = Path(__file__).resolve().parent / "cache"
+# Bump this token whenever the feature construction / adapter semantics
+# change in a way that alters the shape or meaning of cached windows, so
+# that we don't accidentally reuse stale pickles with mismatched channel
+# counts (e.g. after adding new time-based features).
+_WINDOW_CACHE_VERSION = "v2-timefeat"
+
+
+def _load_window_cached(adapter: "WFOAdapter", start: pd.Timestamp, end: pd.Timestamp) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Load (X, closes) for a window, with optional on-disk caching.
+
+    Cache key is based on adapter name, instrument/base_gran (if available),
+    and the [start,end] timestamps.
+    """
+    if not _WINDOW_CACHE_ENABLED:
+        return adapter.load_window(start, end)
+
+    try:
+        _WINDOW_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        # Build a reasonably unique key
+        parts: List[str] = []
+        parts.append(_WINDOW_CACHE_VERSION)
+        name = getattr(adapter, "name", adapter.__class__.__name__)
+        parts.append(str(name))
+        cfg = getattr(adapter, "cfg", None)
+        inst = getattr(cfg, "instrument", None) if cfg is not None else None
+        base_gran = getattr(cfg, "base_gran", None) if cfg is not None else None
+        if inst:
+            parts.append(str(inst))
+        if base_gran:
+            parts.append(str(base_gran))
+        parts.append(start.isoformat())
+        parts.append(end.isoformat())
+        raw_key = "|".join(parts)
+        h = hashlib.sha1(raw_key.encode("utf-8")).hexdigest()
+        path = _WINDOW_CACHE_DIR / f"{h}.pkl"
+
+        if path.exists():
+            with path.open("rb") as f:
+                X, C = pickle.load(f)
+            return X, C
+
+        X, C = adapter.load_window(start, end)
+        # Best-effort cache write
+        try:
+            tmp = path.with_suffix(".pkl.tmp")
+            with tmp.open("wb") as f:
+                pickle.dump((X, C), f, protocol=pickle.HIGHEST_PROTOCOL)
+            os.replace(tmp, path)
+        except Exception:
+            pass
+        return X, C
+    except Exception:
+        # Fallback to direct load on any cache error
+        return adapter.load_window(start, end)
+
+
 def _add_offset(ts: pd.Timestamp, n: float, unit: str, base_gran: str = "M5") -> pd.Timestamp:
     if unit == "steps":
         steps = max(1, int(round(float(n))))
@@ -166,9 +237,9 @@ def _process_window(
     ts_v_e = pd.Timestamp(ts_v_e_iso)
     adapter = _instantiate_adapter(adapter_spec, adapter_kwargs)
     t0 = time.time()
-    X_tr, C_tr = adapter.load_window(ts_tr_s, ts_tr_e)
+    X_tr, C_tr = _load_window_cached(adapter, ts_tr_s, ts_tr_e)
     model = adapter.fit(X_tr, C_tr)
-    X_val, C_val = adapter.load_window(ts_v_s, ts_v_e)
+    X_val, C_val = _load_window_cached(adapter, ts_v_s, ts_v_e)
     metrics = adapter.validate(model, X_val, C_val)
     dt = round(time.time() - t0, 3)
     return {
@@ -211,7 +282,37 @@ def run_wfo(adapter: WFOAdapter, cfg: WFOConfig) -> str:
 
     start_ts = pd.Timestamp(cfg.start, tz="UTC")
     end_ts = pd.Timestamp(cfg.end, tz="UTC")
-    windows = generate_windows(start_ts, end_ts, cfg.train_n, cfg.val_n, cfg.step_n, unit=cfg.unit, base_gran=cfg.base_gran)
+
+    # Optional dynamic geometry: build windows_limit windows ending on
+    # "yesterday" instead of using fixed start/end dates.
+    if getattr(cfg, "rolling_from_yesterday", False):
+        if cfg.windows_limit <= 0:
+            raise ValueError("rolling_from_yesterday requires windows_limit > 0")
+        # Anchor validation end at the end of "yesterday" in UTC.
+        today_utc = pd.Timestamp.now(tz="UTC").normalize()
+        anchor_val_end = today_utc - pd.Timedelta(seconds=1)  # yesterday 23:59:59
+        # Total span from first train start to last val end in units.
+        total_span_units = float(cfg.train_n) + float(cfg.val_n) + float(cfg.step_n) * float(
+            max(0, cfg.windows_limit - 1)
+        )
+        # Invert _add_offset by using a negative total span.
+        start_ts = _add_offset(
+            anchor_val_end + pd.Timedelta(seconds=1),
+            -total_span_units,
+            cfg.unit,
+            cfg.base_gran,
+        )
+        end_ts = anchor_val_end
+
+    windows = generate_windows(
+        start_ts,
+        end_ts,
+        cfg.train_n,
+        cfg.val_n,
+        cfg.step_n,
+        unit=cfg.unit,
+        base_gran=cfg.base_gran,
+    )
     if cfg.windows_limit > 0:
         windows = windows[: cfg.windows_limit]
 
@@ -231,6 +332,8 @@ def run_wfo(adapter: WFOAdapter, cfg: WFOConfig) -> str:
     with open(os.path.join(run_dir, "meta.json"), "w") as f:
         json.dump(meta, f, indent=2)
 
+    trades_path = os.path.join(run_dir, "trades.jsonl")
+
     # Console: run start
     if not cfg.quiet:
         print(json.dumps({
@@ -247,7 +350,7 @@ def run_wfo(adapter: WFOAdapter, cfg: WFOConfig) -> str:
 
     out_path = os.path.join(run_dir, "windows.jsonl")
     equity_points: List[float] = []
-    with open(out_path, "w") as outf:
+    with open(out_path, "w") as outf, open(trades_path, "w") as tlf:
         if int(cfg.parallel) > 1:
             # Parallel execution of windows (no carry-forward assumption)
             from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -298,97 +401,155 @@ def run_wfo(adapter: WFOAdapter, cfg: WFOConfig) -> str:
         else:
             for wi, (ts_tr_s, ts_tr_e, ts_v_s, ts_v_e) in enumerate(windows, start=1):
                 if not cfg.quiet:
-                    print(json.dumps({
-                        "event": "win_begin",
-                        "win": wi,
-                        "train": [ts_tr_s.isoformat(), ts_tr_e.isoformat()],
-                        "val": [ts_v_s.isoformat(), ts_v_e.isoformat()],
-                    }), flush=True)
+                    print(
+                        json.dumps(
+                            {
+                                "event": "win_begin",
+                                "win": wi,
+                                "train": [ts_tr_s.isoformat(), ts_tr_e.isoformat()],
+                                "val": [ts_v_s.isoformat(), ts_v_e.isoformat()],
+                            }
+                        ),
+                        flush=True,
+                    )
 
                 t0 = time.time()
-                X_tr, C_tr = adapter.load_window(ts_tr_s, ts_tr_e)
+                X_tr, C_tr = _load_window_cached(adapter, ts_tr_s, ts_tr_e)
                 if not cfg.quiet:
-                    print(json.dumps({
-                        "event": "train_loaded",
-                        "win": wi,
-                        "rows": int(len(X_tr)),
-                        "cols": int(X_tr.shape[1]) if hasattr(X_tr, 'shape') else None,
-                    }), flush=True)
+                    print(
+                        json.dumps(
+                            {
+                                "event": "train_loaded",
+                                "win": wi,
+                                "rows": int(len(X_tr)),
+                                "cols": int(X_tr.shape[1]) if hasattr(X_tr, "shape") else None,
+                            }
+                        ),
+                        flush=True,
+                    )
 
                 t_fit0 = time.time()
                 if not cfg.quiet:
                     print(json.dumps({"event": "fit_start", "win": wi}), flush=True)
                 model = adapter.fit(X_tr, C_tr)
                 if not cfg.quiet:
-                    print(json.dumps({
-                        "event": "fit_done",
-                        "win": wi,
-                        "sec": round(time.time() - t_fit0, 3),
-                    }), flush=True)
+                    print(
+                        json.dumps(
+                            {
+                                "event": "fit_done",
+                                "win": wi,
+                                "sec": round(time.time() - t_fit0, 3),
+                            }
+                        ),
+                        flush=True,
+                    )
 
-                X_val, C_val = adapter.load_window(ts_v_s, ts_v_e)
+                X_val, C_val = _load_window_cached(adapter, ts_v_s, ts_v_e)
                 if not cfg.quiet:
-                    print(json.dumps({
-                        "event": "val_loaded",
-                        "win": wi,
-                        "rows": int(len(X_val)),
-                    }), flush=True)
+                    print(
+                        json.dumps(
+                            {
+                                "event": "val_loaded",
+                                "win": wi,
+                                "rows": int(len(X_val)),
+                            }
+                        ),
+                        flush=True,
+                    )
                 metrics = adapter.validate(model, X_val, C_val)
-            # Update runner equity curve using validation cum_return
-            try:
-                v_cum = float(metrics.get("cum_return", 0.0))
-            except Exception:
-                v_cum = 0.0
-            last_eq = (equity_points[-1] if equity_points else 1.0)
-            equity_points.append(last_eq * (1.0 + v_cum))
+                # Persist per-window trades for global analysis if adapter exposes them
+                trades = getattr(adapter, "_last_trades", None)
+                if trades:
+                    trade_rows: list[dict[str, Any]] = []
+                    for tr in trades:
+                        try:
+                            trade_rows.append(
+                                {
+                                    "win": wi,
+                                    "instrument": getattr(tr, "instrument", None),
+                                    "side": int(getattr(tr, "side", 0)),
+                                    "net_pnl": float(getattr(tr, "net_pnl", 0.0)),
+                                    "gross_pnl": float(getattr(tr, "gross_pnl", 0.0)),
+                                    "entry_time": str(getattr(tr, "entry_time", "")),
+                                    "exit_time": str(getattr(tr, "exit_time", "")),
+                                    "bars": int(getattr(tr, "bars", 0)),
+                                }
+                            )
+                        except Exception:
+                            continue
+                    if trade_rows:
+                        # Write one JSON object per line for easy streaming/rg usage
+                        tlf.write(json.dumps({"win": wi, "trades": trade_rows}) + "\n")
+                        tlf.flush()
 
-            # add basis-point aliases if present
-            rec = {
-                "event": "window",
-                "win": wi,
-                "train": [ts_tr_s.isoformat(), ts_tr_e.isoformat()],
-                "val": [ts_v_s.isoformat(), ts_v_e.isoformat()],
-                **{k: (None if (isinstance(v, float) and (np.isnan(v) or np.isinf(v))) else v) for k, v in metrics.items()},
-            }
-            # auto-add bp fields for common keys
-            for k in ["cum_return", "max_dd"]:
-                if k in metrics and isinstance(metrics[k], (int, float)) and not np.isnan(metrics[k]):
-                    rec[f"{k}_bp"] = float(metrics[k]) * 1e4
+                # Update runner equity curve using validation cum_return
+                try:
+                    v_cum = float(metrics.get("cum_return", 0.0))
+                except Exception:
+                    v_cum = 0.0
+                last_eq = equity_points[-1] if equity_points else 1.0
+                equity_points.append(last_eq * (1.0 + v_cum))
 
-            outf.write(json.dumps(rec) + "\n")
-            outf.flush()
-
-            # Print per-window done + running session stats
-            sess = {
-                "event": "win_done",
-                "win": wi,
-                "sec": round(time.time() - t0, 3),
-                "v_cum": metrics.get("cum_return", None),
-                "v_sh": metrics.get("sharpe", None),
-                "v_dd": metrics.get("max_dd", None),
-                "v_tr": metrics.get("trades", None),
-            }
-            try:
-                sess_eq = float(equity_points[-1]) if equity_points else 1.0
-                sess_cum = float(sess_eq - 1.0)
-                sess_ret_bp = sess_cum * 1e4
-                sess_win = int(wi)
-                sess_msg = {
-                    "event": "session",
-                    "win": sess_win,
-                    "cum_return": sess_cum,
-                    "cum_return_bp": sess_ret_bp,
+                # add basis-point aliases if present
+                rec = {
+                    "event": "window",
+                    "win": wi,
+                    "train": [ts_tr_s.isoformat(), ts_tr_e.isoformat()],
+                    "val": [ts_v_s.isoformat(), ts_v_e.isoformat()],
+                    **{
+                        k: (
+                            None
+                            if (isinstance(v, float) and (np.isnan(v) or np.isinf(v)))
+                            else v
+                        )
+                        for k, v in metrics.items()
+                    },
                 }
-                if not cfg.quiet:
-                    print(json.dumps(sess), flush=True)
-                    print(json.dumps(sess_msg), flush=True)
-                    if (not cfg.no_chart) and (wi % max(1, int(cfg.chart_every)) == 0):
-                        chart = _render_chart(equity_points, width=60, height=8)
-                        if chart:
-                            print(chart, flush=True)
-            except Exception:
-                # Fallback to just win_done when charting fails
-                if not cfg.quiet:
-                    print(json.dumps(sess), flush=True)
+                # auto-add bp fields for common keys
+                for k in ["cum_return", "max_dd"]:
+                    if (
+                        k in metrics
+                        and isinstance(metrics[k], (int, float))
+                        and not np.isnan(metrics[k])
+                    ):
+                        rec[f"{k}_bp"] = float(metrics[k]) * 1e4
+
+                outf.write(json.dumps(rec) + "\n")
+                outf.flush()
+
+                # Print per-window done + running session stats
+                sess = {
+                    "event": "win_done",
+                    "win": wi,
+                    "sec": round(time.time() - t0, 3),
+                    "v_cum": metrics.get("cum_return", None),
+                    "v_sh": metrics.get("sharpe", None),
+                    "v_dd": metrics.get("max_dd", None),
+                    "v_tr": metrics.get("trades", None),
+                }
+                try:
+                    sess_eq = float(equity_points[-1]) if equity_points else 1.0
+                    sess_cum = float(sess_eq - 1.0)
+                    sess_ret_bp = sess_cum * 1e4
+                    sess_win = int(wi)
+                    sess_msg = {
+                        "event": "session",
+                        "win": sess_win,
+                        "cum_return": sess_cum,
+                        "cum_return_bp": sess_ret_bp,
+                    }
+                    if not cfg.quiet:
+                        print(json.dumps(sess), flush=True)
+                        print(json.dumps(sess_msg), flush=True)
+                        if (not cfg.no_chart) and (
+                            wi % max(1, int(cfg.chart_every)) == 0
+                        ):
+                            chart = _render_chart(equity_points, width=60, height=8)
+                            if chart:
+                                print(chart, flush=True)
+                except Exception:
+                    # Fallback to just win_done when charting fails
+                    if not cfg.quiet:
+                        print(json.dumps(sess), flush=True)
 
     return run_dir

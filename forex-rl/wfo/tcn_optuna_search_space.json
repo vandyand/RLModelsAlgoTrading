@@ -1,0 +1,49 @@
+{
+  "adapter": "tcn-action-eurusd-policy-debug",
+  "adapter_spec": "wfo.adapters.tcn_nq_action:TCNActionNQAdapter",
+
+  "start": "1725-12-01",
+  "end": "1725-12-28",
+  "train_n": [24.0],
+  "val_n": 1.0,
+  "step_n": 1.0,
+  "unit": "days",
+  "windows_limit": 16,
+  "rolling_from_yesterday": true,
+
+  "base_gran": "M5",
+  "out_dir": "wfo/runs",
+
+  "instruments": ["EUR_USD", "USD_JPY", "GBP_USD", "AUD_USD", "USD_CHF",
+                  "USD_CAD", "NZD_USD", "EUR_JPY", "GBP_JPY", "EUR_GBP",
+                  "EUR_CHF", "EUR_AUD", "EUR_CAD", "GBP_CHF", "AUD_JPY"],
+  "grans": "M5,H1,H4",
+  "tcn_base_gran": "M5",
+
+  "tcn_lookback": [12, 4, 64],
+  "tcn_target_horizon": [2, 2, 48],
+  "epochs": 3,
+  "lr": 0.001,
+  "tcn_hidden": [16,16,256],
+  "tcn_kernel": 1,
+  "tcn_blocks": 1,
+  "tcn_dropout": 0.05,
+
+  "mlp_layers": [[32, 32, 256], [32, 32, 256]],
+
+  "label_thresh": [0.00005, 0.001],
+  "label_mode": ["bps","quantile"],
+  "label_quantile_dist": [0.05, 0.05, 0.95],
+
+  "tcn_trade_cost_bps": 3.0,
+
+  "enter_dist": [0.0001, 0.01],
+  "exit_frac": [0.01, 0.99],
+
+  "debug_force_all_long": false,
+
+  "mode": "fast",
+  "no_chart": false,
+  "chart_every": 1,
+  "quiet": false
+}

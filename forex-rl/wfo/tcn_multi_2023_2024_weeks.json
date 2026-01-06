@@ -1,0 +1,36 @@
+{
+  "adapter": "tcn-scalar-threshold",
+  "start": "2023-01-01",
+  "end": "2024-12-31",
+  "train_n": 12.0,
+  "val_n": 1.0,
+  "step_n": 1.0,
+  "unit": "weeks",
+  "windows_limit": 0,
+  "base_gran": "M15",
+  "out_dir": "wfo/runs",
+  "parallel": 0,
+
+  "tcn_instrument": "EUR_USD",
+  "grans": "M15,H1,D",
+  "tcn_base_gran": "M15",
+
+  "tcn_lookback": 72,
+  "tcn_target_horizon": 22,
+  "epochs": 3,
+  "lr": 0.001,
+  "tcn_hidden": 40,
+  "tcn_kernel": 3,
+  "tcn_blocks": 4,
+  "tcn_dropout": 0.06738135694257803,
+
+  "label_long_thresh": 0.0007214131103349863,
+  "label_short_thresh": -0.0006928715440570291,
+  "tcn_trade_cost_bps": 1.0,
+  "candle_cache_base": "http://127.0.0.1:9100",
+
+  "mode": "fast",
+  "no_chart": true,
+  "chart_every": 1,
+  "quiet": true
+}
