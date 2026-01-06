@@ -568,9 +568,9 @@ def main() -> None:
                 # Advantage
                 adv = (rw + cfg.gamma * v_tp1[0] - v_t[0]).detach()
                 # Log prob under Normal on pre-logit
-            logprob = -0.5 * (((pre - logit_t) / sigma) ** 2 + np.log(2 * np.pi) + 2 * log_sigma_const)
-            # Entropy of Normal(sigma): 0.5 * (1 + log(2*pi*sigma^2))
-            entropy = 0.5 * (1.0 + torch.log(2 * torch.tensor(np.pi) * (sigma ** 2)))
+                logprob = -0.5 * (((pre - logit_t) / sigma) ** 2 + np.log(2 * np.pi) + 2 * log_sigma_const)
+                # Entropy of Normal(sigma): 0.5 * (1 + log(2*pi*sigma^2))
+                entropy = 0.5 * (1.0 + torch.log(2 * torch.tensor(np.pi) * (sigma ** 2)))
                 actor_loss = -adv * logprob.mean()
                 value_target = (rw + cfg.gamma * v_tp1[0]).detach()
                 value_loss = cfg.value_coef * 0.5 * (value_target - v_t[0]) ** 2

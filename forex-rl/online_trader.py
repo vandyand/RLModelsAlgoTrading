@@ -887,17 +887,17 @@ def main() -> None:
 
             # Remove stale single-instrument tail block
 
-        except KeyboardInterrupt:
-            print("Interrupted. Exiting.", flush=True)
-            # Best-effort save on exit
-            try:
-                save_policy(model_path, policy, noise_sigma)
-            except Exception:
-                pass
-            break
-        except Exception as exc:
-            print(json.dumps({"error": str(exc)}), flush=True)
-            time.sleep(max(1.0, args.poll_seconds))
+            except KeyboardInterrupt:
+                print("Interrupted. Exiting.", flush=True)
+                # Best-effort save on exit
+                try:
+                    save_policy(model_path, policy, noise_sigma)
+                except Exception:
+                    pass
+                break
+            except Exception as exc:
+                print(json.dumps({"error": str(exc)}), flush=True)
+                time.sleep(max(1.0, args.poll_seconds))
     else:
         # FRB-driven market data with local IPC broker
         if frb_feed is None:

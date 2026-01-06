@@ -173,20 +173,20 @@ class CandleCache:
         try:
             req = instruments_ep.InstrumentsCandles(
                 instrument=self.instrument,
-                params={\"granularity\": granularity, \"count\": count, \"price\": \"M\"},
+                params={"granularity": granularity, "count": int(count), "price": "M"},
             )
             resp = self.api.request(req)
             out2: List[Dict[str, Any]] = []
-            for c in resp.get(\"candles\", []):
-                mid = c.get(\"mid\") or {}
+            for c in resp.get("candles", []):
+                mid = c.get("mid") or {}
                 out2.append({
-                    \"time\": c.get(\"time\"),
-                    \"complete\": bool(c.get(\"complete\", False)),
-                    \"o\": float(mid.get(\"o\")) if mid.get(\"o\") is not None else None,
-                    \"h\": float(mid.get(\"h\")) if mid.get(\"h\") is not None else None,
-                    \"l\": float(mid.get(\"l\")) if mid.get(\"l\") is not None else None,
-                    \"c\": float(mid.get(\"c\")) if mid.get(\"c\") is not None else None,
-                    \"v\": float(c.get(\"volume\", 0.0)),
+                    "time": c.get("time"),
+                    "complete": bool(c.get("complete", False)),
+                    "o": float(mid.get("o")) if mid.get("o") is not None else None,
+                    "h": float(mid.get("h")) if mid.get("h") is not None else None,
+                    "l": float(mid.get("l")) if mid.get("l") is not None else None,
+                    "c": float(mid.get("c")) if mid.get("c") is not None else None,
+                    "v": float(c.get("volume", 0.0)),
                 })
             return out2
         except Exception:
